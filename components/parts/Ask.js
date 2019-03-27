@@ -1,31 +1,31 @@
-var React = require('react');
-var Display = require('./Display');
+const React = require('react');
+const Display = require('./Display');
 
-var Ask = React.createClass({
+export default class Ask extends React.Component {
     getInitialState(){
         return {
             choices: [],
             answer: undefined
         };
-    },
+    }
 
     componentWillMount(){
         this.setUpChoices();
-    },
+    }
 
     componentWillReceiveProps(){
         this.setUpChoices();
-    },
+    }
 
     setUpChoices(){
-        var choices = Object.keys(this.props.question);
+        const choices = Object.keys(this.props.question);
         choices.shift();
 
         this.setState({
             choices: choices,
             answer: sessionStorage.answer
         });
-    },
+    }
 
     select(choice){
         this.setState({
@@ -37,10 +37,10 @@ var Ask = React.createClass({
             question: this.props.question,
             choice: choice
         });
-    },
+    }
 
     addChoiceButton(choice, i){
-        var buttonTypes = ['primary', 'success', 'warning', 'danger'];
+        const buttonTypes = ['primary', 'success', 'warning', 'danger'];
         return (
             <button onClick={this.select.bind(null, choice)}
                     className={"col-xs-12 col-sm-6 btn btn-" + buttonTypes[i]}
@@ -49,7 +49,7 @@ var Ask = React.createClass({
             </button>
 
         );
-    },
+    }
 
     render(){
 
@@ -71,12 +71,4 @@ var Ask = React.createClass({
             </div>
         );
     }
-});
-
-
-module.exports = Ask;
-
-
-
-
-
+};

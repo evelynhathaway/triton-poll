@@ -1,9 +1,10 @@
-var React = require('react');
+const PropTypes = require('prop-types');
+const React = require('react');
 
-var Header = React.createClass({
-    propTypes: {
-        title: React.PropTypes.string.isRequired
-    },
+export default class Header extends React.Component {
+    propTypes = {
+        title: PropTypes.string.isRequired
+    }
 
     render(){
         return (
@@ -17,7 +18,5 @@ var Header = React.createClass({
                 </div>
             </header>
         );
-    },
-});
-
-module.exports = Header;
+    }
+};

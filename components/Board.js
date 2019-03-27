@@ -1,8 +1,7 @@
-var React = require('react');
-var Display = require('./parts/Display');
+const React = require('react');
+const Display = require('./parts/Display');
 
-var Board = React.createClass({
-
+export default class Board extends React.Component {
     barGraphData(results){
         return Object.keys(results).map(function (choice) {
             return {
@@ -10,7 +9,7 @@ var Board = React.createClass({
                 value: results[choice]
             };
         });
-    },
+    }
 
     render(){
         return (
@@ -28,9 +27,4 @@ var Board = React.createClass({
            </div>
         );
     }
-});
-
-module.exports = Board;
-
-
-
+};

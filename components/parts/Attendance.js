@@ -1,7 +1,6 @@
-var React = require('react');
+const React = require('react');
 
-var Attendance = React.createClass({
-
+export default class Attendance extends React.Component {
     addMemberRow(member, i){
         return (
             <tr key={i}>
@@ -10,7 +9,7 @@ var Attendance = React.createClass({
             </tr>
 
         );
-    },
+    }
 
     render(){
        return ( <div>
@@ -30,6 +29,4 @@ var Attendance = React.createClass({
        );
     }
 
-});
-
-module.exports = Attendance;
+};

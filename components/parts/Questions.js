@@ -1,10 +1,10 @@
-var React = require('react');
+const React = require('react');
 
-var Questions = React.createClass({
+export default class Questions extends React.Component {
 
     ask(question){
         this.props.emit('ask', question);
-    },
+    }
 
     addQuestion(question, i){
         return (
@@ -14,7 +14,7 @@ var Questions = React.createClass({
         );
 
 
-    },
+    }
 
     render(){
 
@@ -25,12 +25,4 @@ var Questions = React.createClass({
             </div>
         );
     }
-});
-
-
-module.exports = Questions;
-
-
-
-
-
+};

@@ -1,16 +1,16 @@
 
-var express = require('express');
-var app = express();
-var _ = require('underscore');
+const express = require('express');
+const app = express();
+const _ = require('underscore');
 
 // here we'll store our connections...
-var connections = [];
-var title = 'Default presentation title';
-var audience = [];
-var speaker = {};
-var questions = require('./app-questions');
-var currentQuestion = false;
-var results = {
+const connections = [];
+const title = 'Default presentation title';
+const audience = [];
+const speaker = {};
+const questions = require('./app-questions');
+const currentQuestion = false;
+const results = {
     a: 0,
     b: 0,
     c: 0,
@@ -21,15 +21,15 @@ var results = {
 app.use(express.static('./public'));
 app.use(express.static('./node_modules/bootstrap/dist'));
 
-var server = app.listen(3000);
-var io = require('socket.io').listen(server);
+const server = app.listen(3000);
+const io = require('socket.io').listen(server);
 
 // event handler for when a socket connects
 io.sockets.on('connection', function (socket) {
 
     //listening to join event from client side when someone joins presentation...
     socket.on('join', function (payload) {
-        var newMember = {
+        const newMember = {
             id: this.id,
             name: payload.name,
             type: 'audience'
@@ -58,7 +58,7 @@ io.sockets.on('connection', function (socket) {
         });
         console.log("Presentation Started: '%s' by %s", title, speaker.name);
     });
-    
+
     socket.on('ask', function (question) {
         currentQuestion = question;
         results = { a:0, b:0, c:0, d:0};
@@ -91,7 +91,7 @@ io.sockets.on('connection', function (socket) {
     // disconnect handler...
     socket.once('disconnect', function () {
         // find a member of an audience that have the same id as currently diisconnecting socket...
-        var member = _.findWhere(audience, {
+        const member = _.findWhere(audience, {
             id: this.id
         });
         //if  member exists, remove it from audience array, broadcast new audience state, and log new data to console...

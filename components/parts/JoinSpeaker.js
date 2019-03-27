@@ -1,15 +1,15 @@
-var React = require('react');
+const React = require('react');
 
-var JoinSpeaker = React.createClass({
+export default class JoinSpeaker extends React.Component {
 
     start(){
-        var speakersName = this.refs.name.value;
-        var presentationTitle = this.refs.title.value;
+        const speakersName = this.refs.name.value;
+        const presentationTitle = this.refs.title.value;
         this.props.emit('start', {
             name: speakersName,
             title: presentationTitle
         });
-    },
+    }
 
     render(){
         return (
@@ -29,6 +29,4 @@ var JoinSpeaker = React.createClass({
             </form>
         );
     }
-});
-
-module.exports = JoinSpeaker;
+};

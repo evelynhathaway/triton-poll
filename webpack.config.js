@@ -1,20 +1,23 @@
-/**
- * Created by Milos on 11/29/2015.
- */
+const path = require("path");
 
 module.exports = {
+    mode: "development",
     entry: "./app-client.js",
     output: {
-        filename: "public/bundle.js"
+        path: path.resolve(__dirname, "public"),
+        filename: "bundle.js"
     },
     module: {
-        loaders: [
+        rules: [
             {
-                exclude: /(node_modules | app-server.js)/,
-                loader: 'babel',
-                query:
-                {
-                    presets:['react']
+                test: /\.m?js$/,
+                exclude: /(node_modules|bower_components|app-server\.js)/,
+                use: {
+                    loader: "babel-loader",
+                    options: {
+                        presets: ["@babel/preset-react"],
+                        plugins: ["@babel/plugin-proposal-class-properties"]
+                    }
                 }
             }
         ]

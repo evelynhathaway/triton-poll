@@ -1,10 +1,10 @@
-var React = require('react');
-var Display = require('./parts/Display');
-var JoinSpeaker = require('./parts/JoinSpeaker');
-var Attendance = require('./parts/Attendance');
-var Questions = require('./parts/Questions');
+const React = require('react');
+const Display = require('./parts/Display');
+const JoinSpeaker = require('./parts/JoinSpeaker');
+const Attendance = require('./parts/Attendance');
+const Questions = require('./parts/Questions');
 
-var Speaker = React.createClass({
+export default class Speaker extends React.Component {
     render(){
         return (
             <div>
@@ -24,10 +24,4 @@ var Speaker = React.createClass({
             </div>
         );
     }
-});
-
-
-module.exports = Speaker;
-
-
-
+};
