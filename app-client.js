@@ -28,15 +28,15 @@ export default class App extends React.Component {
 
     componentWillMount() {
         this.socket = io("http://localhost:3000"); // TODO: change on `env`: prod|dev
-        this.socket.on("connect", this.connect);
-        this.socket.on("disconnect", this.disconnect);
-        this.socket.on("welcome", this.updateState);
-        this.socket.on("joined", this.joined);
-        this.socket.on("audience", this.updateAudience);
-        this.socket.on("start", this.start);
-        this.socket.on("end", this.updateState);
-        this.socket.on("ask", this.ask);
-        this.socket.on("results", this.updateResults);
+        this.socket.on("connect", this.connect.bind(this));
+        this.socket.on("disconnect", this.disconnect.bind(this));
+        this.socket.on("welcome", this.updateState.bind(this));
+        this.socket.on("joined", this.joined.bind(this));
+        this.socket.on("audience", this.updateAudience.bind(this));
+        this.socket.on("start", this.start.bind(this));
+        this.socket.on("end", this.updateState.bind(this));
+        this.socket.on("ask", this.ask.bind(this));
+        this.socket.on("results", this.updateResults.bind(this));
     }
 
     joined(member) {
