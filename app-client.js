@@ -1,28 +1,139 @@
 import React from "react";
-
+import ReactDOM from "react-dom";
 import {BrowserRouter as Router, Route} from "react-router-dom";
+import io from "socket.io-client";
 
-import APP from "./components/APP";
 import Audience from "./components/Audience";
 import Board from "./components/Board";
 import Speaker from "./components/Speaker";
 import Whoops404 from "./components/Whoops404";
-import ReactDOM from "react-dom";
+import Header from "./components/parts/Header";
 
-// Main component that will include and render all other componennts is APP!
-const routes = (
-    <Router component={APP}>
-        <div>
-            <Route path="/" component={Audience}/>
-            <Route name="speaker" path="/speaker/" component={Speaker}/>
-            <Route name="board" path="/board/" component={Board}/>
-            {/* <Route path="*" component={Whoops404}/> */}
-        </div>
-    </Router>
-);
+
+export default class App extends React.Component {
+    constructor(props, context) {
+        super(props, context);
+
+        this.state = {
+            status: "disconnected",
+            title: "",
+            member: {},
+            audience: [],
+            speaker: "",
+            questions: [],
+            currentQuestion: false,
+            results: {},
+        };
+    };
+
+    componentWillMount() {
+        this.socket = io("http://localhost:3000"); // TODO: change on `env`: prod|dev
+        this.socket.on("connect", this.connect);
+        this.socket.on("disconnect", this.disconnect);
+        this.socket.on("welcome", this.updateState);
+        this.socket.on("joined", this.joined);
+        this.socket.on("audience", this.updateAudience);
+        this.socket.on("start", this.start);
+        this.socket.on("end", this.updateState);
+        this.socket.on("ask", this.ask);
+        this.socket.on("results", this.updateResults);
+    }
+
+    joined(member) {
+        sessionStorage.member = JSON.stringify(member);
+        this.setState({
+            member: member,
+        });
+    }
+
+    emit(eventName, payload) {
+        this.socket.emit(eventName, payload);
+    }
+
+    connect() {
+        const member = (sessionStorage.member) ? JSON.parse(sessionStorage.member) : null;
+
+        //if(member){
+        //    if(member.type === 'member'){
+        //        this.emit('join', member);
+        //    }else if(member.type === 'speaker'){
+        //        this.emit('start', member);
+        //    }
+        //}
+
+        if (member && member.type === "audience"){
+            this.emit("join",member);
+        } else if (member && member.type === "speaker"){
+            this.emit("start", {
+                name: member.name,
+                title: sessionStorage.title,
+            });
+        }
+        console.log("test", this)
+        this.setState({
+            status: "connected"
+        });
+    }
+    disconnect() {
+        console.log("Disconnected");
+        this.setState({
+            status: "disconnected",
+            title: "disconnected",
+            speaker: "",
+        });
+    }
+
+    updateState(serverState){
+        // all our variables in state are covered...(title, audience, speaker now got values from server)
+        this.setState(serverState);
+    }
+
+    updateAudience(audienceArray){
+        this.setState({
+            audience: audienceArray
+        });
+    }
+
+    start(presentation){
+        if(this.state.member.type === "speaker"){
+            sessionStorage.title = presentation.title;
+        }
+        this.setState(presentation);
+    }
+
+    ask(question){
+        sessionStorage.answer = '';
+        this.setState({
+            currentQuestion: question,
+            results : {a:0, b:0, c:0, d:0},
+        });
+    }
+
+    updateResults(data){
+        this.setState({
+            results: data,
+        });
+    }
+
+    render() {
+        console.log("did app")
+        return (
+            <div>
+                <Header {...this.state}/>
+                <Router>
+                    <Route path="/" component={props => <Audience emit={this.emit} {...this.state} {...props}/>}/>
+                    <Route name="speaker" path="/speaker/" component={props => <Speaker emit={this.emit} {...this.state} {...props}/>}/>
+                    <Route name="board" path="/board/" component={props => <Board emit={this.emit} {...this.state} {...props}/>}/>
+                    <Route component={props => <Whoops404 emit={this.emit} {...this.state} {...props}/>}/>
+                </Router>
+            </div>
+        );
+    }
+};
+
 
 // Now that we have routes configured, lets render components...
 ReactDOM.render(
-    routes,
-    document.getElementById("react-container")
+    <App/>,
+    document.getElementById("react-container"),
 );

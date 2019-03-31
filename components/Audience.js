@@ -4,7 +4,7 @@ import Join from "./parts/Join";
 import Ask from "./parts/Ask";
 
 export default class Audience extends React.Component {
-    render(){
+    render() {
         return (
             <div>
                 <Display if={this.props.status === "connected"}>

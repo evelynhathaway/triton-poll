@@ -1,11 +1,7 @@
-const PropTypes = require('prop-types');
-const React = require('react');
+const PropTypes = require("prop-types");
+const React = require("react");
 
 export default class Header extends React.Component {
-    propTypes = {
-        title: PropTypes.string.isRequired
-    }
-
     render(){
         return (
             <header className="row">
@@ -18,5 +14,9 @@ export default class Header extends React.Component {
                 </div>
             </header>
         );
+    }
+
+    static propTypes = {
+        title: PropTypes.string.isRequired
     }
 };
