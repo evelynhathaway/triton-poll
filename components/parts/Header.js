@@ -1,8 +1,8 @@
-const PropTypes = require("prop-types");
-const React = require("react");
+import PropTypes from "prop-types";
+import React from "react";
 
 export default class Header extends React.Component {
-    render(){
+    render() {
         return (
             <header className="row">
                 <div className="col-xs-10">

@@ -1,23 +1,23 @@
-const React = require('react');
-const Display = require('./Display');
+import React from "react";
+import Display from "./Display";
 
 export default class Ask extends React.Component {
-    getInitialState(){
+    getInitialState() {
         return {
             choices: [],
             answer: undefined
         };
     }
 
-    componentWillMount(){
+    componentWillMount() {
         this.setUpChoices();
     }
 
-    componentWillReceiveProps(){
+    componentWillReceiveProps() {
         this.setUpChoices();
     }
 
-    setUpChoices(){
+    setUpChoices() {
         const choices = Object.keys(this.props.question);
         choices.shift();
 
@@ -27,31 +27,30 @@ export default class Ask extends React.Component {
         });
     }
 
-    select(choice){
+    select(choice) {
         this.setState({
             answer: choice
         });
         sessionStorage.answer = choice;
 
-        this.props.emit('answer', {
+        this.props.emit("answer", {
             question: this.props.question,
             choice: choice
         });
     }
 
-    addChoiceButton(choice, i){
-        const buttonTypes = ['primary', 'success', 'warning', 'danger'];
+    addChoiceButton(choice, i) {
+        const buttonTypes = ["primary", "success", "warning", "danger"];
         return (
             <button onClick={this.select.bind(null, choice)}
                     className={"col-xs-12 col-sm-6 btn btn-" + buttonTypes[i]}
                     key={i}>
                 {choice}: {this.props.question[choice]}
             </button>
-
         );
     }
 
-    render(){
+    render() {
 
         return (
             <div id="currentQuestion">

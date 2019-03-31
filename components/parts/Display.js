@@ -1,7 +1,7 @@
-const React = require('react');
+import React from "react";
 
 export default class Display extends React.Component {
-    render(){
+    render() {
         return (this.props.if) ? <div>{this.props.children}</div> : null;
     }
 };

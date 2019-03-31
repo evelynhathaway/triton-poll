@@ -1,12 +1,12 @@
-const React = require('react');
+import React from "react";
 
 export default class Questions extends React.Component {
 
-    ask(question){
-        this.props.emit('ask', question);
+    ask(question) {
+        this.props.emit("ask", question);
     }
 
-    addQuestion(question, i){
+    addQuestion(question, i) {
         return (
             <div key={i} className="col-xs-12 col-sm-6 sol-md-3">
                 <span onClick={this.ask.bind(null, question)}>{question.q}</span>
@@ -16,7 +16,7 @@ export default class Questions extends React.Component {
 
     }
 
-    render(){
+    render() {
 
         return (
             <div id="questions" className="row">

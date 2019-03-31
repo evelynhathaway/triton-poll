@@ -25,7 +25,6 @@ const io = require("socket.io").listen(server);
 
 // event handler for when a socket connects
 io.sockets.on("connection", function (socket) {
-
     //listening to join event from client side when someone joins presentation...
     socket.on("join", function (payload) {
         const newMember = {
@@ -60,7 +59,7 @@ io.sockets.on("connection", function (socket) {
 
     socket.on("ask", function (question) {
         currentQuestion = question;
-        results = { a:0, b:0, c:0, d:0};
+        results = {a:0, b:0, c:0, d:0};
         io.sockets.emit("ask", currentQuestion);
         console.log("Question asked \"%s\"", question.q);
     });
@@ -91,30 +90,28 @@ io.sockets.on("connection", function (socket) {
     socket.once("disconnect", function () {
         // find a member of an audience that have the same id as currently diisconnecting socket...
         const member = _.findWhere(audience, {
-            id: this.id
+            id: this.id,
         });
         //if  member exists, remove it from audience array, broadcast new audience state, and log new data to console...
-        if(member){
+        if (member) {
             audience.splice(audience.indexOf(member), 1);
             io.sockets.emit("audience", audience);
             console.log("Left: %s (%s audience members)", member.name, audience.length);
-        }else if(this.id === speaker.id){
+        } else if (this.id === speaker.id) {
             console.log("%s has left. '%s' is over!", speaker.name, title);
             speaker = {};
             title = "Untitled presentation";
             io.sockets.emit("end", {
                 title: title,
                 speaker : "",
-                audience: audience
+                audience: audience,
             });
-
         }
 
         connections.splice(connections.indexOf(socket), 1);
         socket.disconnect();
         console.log("Disconnected! %s sockets remaining", connections.length);
     });
-
 });
 
 

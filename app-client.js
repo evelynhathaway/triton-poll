@@ -11,8 +11,8 @@ import Header from "./components/parts/Header";
 
 
 export default class App extends React.Component {
-    constructor(props, context) {
-        super(props, context);
+    constructor(props) {
+        super(props);
 
         this.state = {
             status: "disconnected",
@@ -53,25 +53,25 @@ export default class App extends React.Component {
     connect() {
         const member = (sessionStorage.member) ? JSON.parse(sessionStorage.member) : null;
 
-        //if(member){
-        //    if(member.type === 'member'){
-        //        this.emit('join', member);
-        //    }else if(member.type === 'speaker'){
-        //        this.emit('start', member);
+        //if(member) {
+        //    if (member.type === "member") {
+        //        this.emit("join", member);
+        //    } else if(member.type === "speaker") {
+        //        this.emit("start", member);
         //    }
         //}
 
-        if (member && member.type === "audience"){
+        if (member && member.type === "audience") {
             this.emit("join",member);
-        } else if (member && member.type === "speaker"){
+        } else if (member && member.type === "speaker") {
             this.emit("start", {
                 name: member.name,
                 title: sessionStorage.title,
             });
         }
-        console.log("test", this)
+
         this.setState({
-            status: "connected"
+            status: "connected",
         });
     }
     disconnect() {
@@ -83,40 +83,39 @@ export default class App extends React.Component {
         });
     }
 
-    updateState(serverState){
+    updateState(serverState) {
         // all our variables in state are covered...(title, audience, speaker now got values from server)
         this.setState(serverState);
     }
 
-    updateAudience(audienceArray){
+    updateAudience(audienceArray) {
         this.setState({
             audience: audienceArray
         });
     }
 
-    start(presentation){
-        if(this.state.member.type === "speaker"){
+    start(presentation) {
+        if (this.state.member.type === "speaker") {
             sessionStorage.title = presentation.title;
         }
         this.setState(presentation);
     }
 
-    ask(question){
-        sessionStorage.answer = '';
+    ask(question) {
+        sessionStorage.answer = "";
         this.setState({
             currentQuestion: question,
             results : {a:0, b:0, c:0, d:0},
         });
     }
 
-    updateResults(data){
+    updateResults(data) {
         this.setState({
             results: data,
         });
     }
 
     render() {
-        console.log("did app")
         return (
             <div>
                 <Header {...this.state}/>
