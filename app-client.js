@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import {BrowserRouter as Router, Route} from "react-router-dom";
+import {BrowserRouter as Router, Switch, Route} from "react-router-dom";
 import io from "socket.io-client";
 
 import Audience from "./components/Audience";
@@ -123,10 +123,12 @@ export default class App extends React.Component {
             <div>
                 <Header {...this.state}/>
                 <Router>
-                    <Route path="/" component={props => <Audience emit={boundEmit} {...this.state} {...props}/>}/>
-                    <Route name="speaker" path="/speaker/" component={props => <Speaker emit={boundEmit} {...this.state} {...props}/>}/>
-                    <Route name="board" path="/board/" component={props => <Board emit={boundEmit} {...this.state} {...props}/>}/>
-                    <Route component={props => <Whoops404 emit={boundEmit} {...this.state} {...props}/>}/>
+                    <Switch>
+                        <Route path="/" exact component={props => <Audience emit={boundEmit} {...this.state} {...props}/>}/>
+                        <Route path="/speaker/" component={props => <Speaker emit={boundEmit} {...this.state} {...props}/>}/>
+                        <Route path="/board/" component={props => <Board emit={boundEmit} {...this.state} {...props}/>}/>
+                        <Route component={props => <Whoops404 emit={boundEmit} {...this.state} {...props}/>}/>
+                    </Switch>
                 </Router>
             </div>
         );
