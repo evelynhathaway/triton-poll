@@ -5,11 +5,11 @@ export default class Join extends React.Component {
     constructor(props) {
         super(props);
 
-        this.memberNameEle = React.createRef();
+        this.memberNameRef = React.createRef();
     }
 
     join() {
-        const {memberNameEle} = this;
+        const memberNameEle = this.memberNameRef.current;
         const memberName = memberNameEle.value;
 
         this.props.emit("join", {
@@ -21,10 +21,10 @@ export default class Join extends React.Component {
 
     render() {
         return (
-            <form action="javascript:void(0)" onSubmit={this.join}>
+            <form action="javascript:void(0)" onSubmit={() => this.join()}>
                 <label>Full Name</label>
                 <input
-                    ref={this.memberNameEle}
+                    ref={this.memberNameRef}
                     className="form-control"
                     placeholder="enter your full name..."
                     required

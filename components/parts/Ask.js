@@ -2,12 +2,8 @@ import React from "react";
 import Display from "./Display";
 
 export default class Ask extends React.Component {
-    getInitialState() {
-        return {
-            choices: [],
-            answer: undefined
-        };
-    }
+    choices = []
+    answer = undefined
 
     componentWillMount() {
         this.setUpChoices();
@@ -23,38 +19,39 @@ export default class Ask extends React.Component {
 
         this.setState({
             choices: choices,
-            answer: sessionStorage.answer
+            answer: sessionStorage.answer,
         });
     }
 
     select(choice) {
         this.setState({
-            answer: choice
+            answer: choice,
         });
         sessionStorage.answer = choice;
 
         this.props.emit("answer", {
             question: this.props.question,
-            choice: choice
+            choice: choice,
         });
     }
 
     addChoiceButton(choice, i) {
         const buttonTypes = ["primary", "success", "warning", "danger"];
+
         return (
-            <button onClick={this.select.bind(null, choice)}
-                    className={"col-xs-12 col-sm-6 btn btn-" + buttonTypes[i]}
-                    key={i}>
+            <button
+                onClick={this.select.bind(this, choice)}
+                className={"col-xs-12 col-sm-6 btn btn-" + buttonTypes[i]}
+                key={i}
+            >
                 {choice}: {this.props.question[choice]}
             </button>
         );
     }
 
     render() {
-
         return (
             <div id="currentQuestion">
-
                 <Display if={this.state.answer}>
                     <h3>You answered: {this.state.answer} </h3>
                     <p>{this.props.question[this.state.answer]}</p>
@@ -64,7 +61,7 @@ export default class Ask extends React.Component {
                     <h2>{this.props.question.q}</h2>
 
                     <div className="row">
-                        {this.state.choices.map(this.addChoiceButton)}
+                        {this.state.choices.map(this.addChoiceButton.bind(this))}
                     </div>
                 </Display>
             </div>

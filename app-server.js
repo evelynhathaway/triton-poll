@@ -3,12 +3,12 @@ const _ = require("underscore");
 
 // here we'll store our connections...
 const connections = [];
-const title = "Default presentation title";
+let title = "Default presentation title";
 const audience = [];
-const speaker = {};
+let speaker = {};
 const questions = require("./app-questions");
-const currentQuestion = false;
-const results = {
+let currentQuestion = false;
+let results = {
     a: 0,
     b: 0,
     c: 0,
@@ -17,6 +17,7 @@ const results = {
 
 
 const app = express();
+// TODO: serve React pages on routes
 app.use(express.static("./public"));
 app.use(express.static("./node_modules/bootstrap/dist"));
 
@@ -30,7 +31,7 @@ io.sockets.on("connection", function (socket) {
         const newMember = {
             id: this.id,
             name: payload.name,
-            type: "audience"
+            type: "audience",
         };
 
         audience.push(newMember);
@@ -49,7 +50,7 @@ io.sockets.on("connection", function (socket) {
         title = payload.title;
 
         this.emit("joined", speaker);
-        //broadcast app state to all audience members  that are already logged in...
+        //broadcast app state to all audience members that are already logged in...
         io.sockets.emit("start", {
             title: title,
             speaker: speaker.name,

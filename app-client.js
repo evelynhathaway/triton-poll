@@ -62,7 +62,7 @@ export default class App extends React.Component {
         //}
 
         if (member && member.type === "audience") {
-            this.emit("join",member);
+            this.emit("join", member);
         } else if (member && member.type === "speaker") {
             this.emit("start", {
                 name: member.name,
@@ -116,14 +116,17 @@ export default class App extends React.Component {
     }
 
     render() {
+        // Create bound copy of `this.emit` for child elements
+        const boundEmit = this.emit.bind(this);
+
         return (
             <div>
                 <Header {...this.state}/>
                 <Router>
-                    <Route path="/" component={props => <Audience emit={this.emit} {...this.state} {...props}/>}/>
-                    <Route name="speaker" path="/speaker/" component={props => <Speaker emit={this.emit} {...this.state} {...props}/>}/>
-                    <Route name="board" path="/board/" component={props => <Board emit={this.emit} {...this.state} {...props}/>}/>
-                    <Route component={props => <Whoops404 emit={this.emit} {...this.state} {...props}/>}/>
+                    <Route path="/" component={props => <Audience emit={boundEmit} {...this.state} {...props}/>}/>
+                    <Route name="speaker" path="/speaker/" component={props => <Speaker emit={boundEmit} {...this.state} {...props}/>}/>
+                    <Route name="board" path="/board/" component={props => <Board emit={boundEmit} {...this.state} {...props}/>}/>
+                    <Route component={props => <Whoops404 emit={boundEmit} {...this.state} {...props}/>}/>
                 </Router>
             </div>
         );
