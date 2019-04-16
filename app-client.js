@@ -43,25 +43,21 @@ export default class App extends React.Component {
         });
     }
 
-    emit(eventName, payload) {
-        this.socket.emit(eventName, payload);
-    }
-
     connect() {
         const member = (sessionStorage.member) ? JSON.parse(sessionStorage.member) : null;
 
         //if(member) {
         //    if (member.type === "member") {
-        //        this.emit("join", member);
+        //        this.socket.emit("join", member);
         //    } else if(member.type === "speaker") {
-        //        this.emit("start", member);
+        //        this.socket.emit("start", member);
         //    }
         //}
 
         if (member && member.type === "audience") {
-            this.emit("join", member);
+            this.socket.emit("join", member);
         } else if (member && member.type === "speaker") {
-            this.emit("start", {
+            this.socket.emit("start", {
                 name: member.name,
                 title: sessionStorage.title,
             });
@@ -134,12 +130,13 @@ export default class App extends React.Component {
         return (
             <div>
                 <AppContext.Provider value={{
+                    // Expose socket
+                    socket: this.socket,
                     // Allow access to state from this App component
                     state: this.state,
                     // Create bound copy of special methods for child elements
                     globalMethods: {
                         setState: this.setState.bind(this),
-                        emit: this.emit.bind(this),
                     },
                 }}>
                     <Header/>

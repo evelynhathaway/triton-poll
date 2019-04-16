@@ -5,9 +5,9 @@ export default class Questions extends React.Component {
     static contextType = AppContext
 
     ask(question) {
-        const {emit} = this.context.globalMethods;
+        const {socket} = this.context;
 
-        emit("ask", question);
+        socket.emit("ask", question);
     }
 
     addQuestion(question, i) {

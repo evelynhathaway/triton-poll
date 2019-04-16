@@ -27,14 +27,14 @@ export default class Ask extends React.Component {
     }
 
     select(choice) {
-        const {emit} = this.context.globalMethods;
+        const {socket} = this.context;
 
         this.setState({
             answer: choice,
         });
         sessionStorage.answer = choice;
 
-        emit("answer", {
+        socket.emit("answer", {
             question: this.props.question,
             choice: choice,
         });

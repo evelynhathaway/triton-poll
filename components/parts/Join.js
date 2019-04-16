@@ -10,7 +10,7 @@ export default class Join extends React.Component {
     roomCodeRef = React.createRef()
 
     join() {
-        const {emit} = this.context.globalMethods;
+        const {socket} = this.context;
 
         const countryNameEle = this.countryNameRef.current;
         const roomCodeEle = this.roomCodeRef.current;
@@ -18,7 +18,7 @@ export default class Join extends React.Component {
         const countryName = countryNameEle.value;
         const roomCode = roomCodeEle.value.toUpperCase();
 
-        emit("join", {countryName, roomCode});
+        socket.emit("join", {countryName, roomCode});
     }
 
     render() {

@@ -9,7 +9,7 @@ export default class JoinSpeaker extends React.Component {
     roomCodeRef = React.createRef()
 
     createRoom() {
-        const {emit} = this.context.globalMethods;
+        const {socket} = this.context;
 
         const committeeEle = this.committeeRef.current;
         const roomCodeEle = this.roomCodeRef.current;
@@ -17,7 +17,7 @@ export default class JoinSpeaker extends React.Component {
         const committee = committeeEle.value;
         const roomCode = roomCodeEle.value.toUpperCase();
 
-        emit("create room", {committee, roomCode});
+        socket.emit("create room", {committee, roomCode});
     }
 
     render() {
