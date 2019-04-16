@@ -1,37 +1,45 @@
+// TODO: if wrong room number
+
 import React from "react";
-import {Link} from "react-router-dom";
 
 export default class Join extends React.Component {
-    constructor(props) {
-        super(props);
-
-        this.memberNameRef = React.createRef();
-    }
+    countryNameRef = React.createRef()
+    roomCodeRef = React.createRef()
 
     join() {
-        const memberNameEle = this.memberNameRef.current;
-        const memberName = memberNameEle.value;
+        const countryNameEle = this.countryNameRef.current;
+        const roomCodeEle = this.roomCodeRef.current;
 
-        this.props.emit("join", {
-            name: memberName,
-        });
+        const countryName = countryNameEle.value;
+        const roomCode = roomCodeEle.value.toUpperCase();
 
-        memberNameEle.value = "";
+        this.props.emit("join", {countryName, roomCode});
     }
 
     render() {
         return (
-            <form action="javascript:void(0)" onSubmit={() => this.join()}>
-                <label>Full Name</label>
+            <form action="javascript:void(0)" onSubmit={this.join.bind(this)}>
+                <label htmlFor="countryname-input">Country name</label>
+                <p>Enter it as it appears on your placard.</p>
                 <input
-                    ref={this.memberNameRef}
+                    ref={this.countryNameRef}
                     className="form-control"
-                    placeholder="enter your full name..."
+                    placeholder="United States of America"
+                    id="countryname-input"
                     required
                 />
+
+                <label htmlFor="room-input">Room code</label>
+                <p>This should be written at the front of the room or otherwise provided by a chair.</p>
+                <input
+                    ref={this.roomCodeRef}
+                    className="form-control"
+                    id="room-input"
+                    placeholder="Room code"
+                    required
+                />
+
                 <button className="btn btn-primary">Join</button>
-                <Link to="/speaker">Join as Speaker</Link>
-                <Link to="/board">Results Board</Link>
             </form>
         );
     }

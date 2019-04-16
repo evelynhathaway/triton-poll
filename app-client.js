@@ -11,24 +11,20 @@ import Header from "./components/parts/Header";
 
 
 export default class App extends React.Component {
-    constructor(props) {
-        super(props);
-
-        this.state = {
-            status: "disconnected",
-            title: "",
-            member: {},
-            audience: [],
-            speaker: "",
-            questions: [],
-            currentQuestion: false,
-            results: {},
-        };
+    state = {
+        status: "disconnected",
+        committee: "",
+        member: {},
+        audience: [], // TODO: IF speaker
+        questions: [],
+        currentQuestion: false,
+        results: {}, // TODO: IF speaker
     };
 
     componentWillMount() {
         this.socket = io("http://localhost:3000"); // TODO: change on `env`: prod|dev
         this.socket.on("connect", this.connect.bind(this));
+        this.socket.on("reconnect", this.reconnect.bind(this));
         this.socket.on("disconnect", this.disconnect.bind(this));
         this.socket.on("welcome", this.updateState.bind(this));
         this.socket.on("joined", this.joined.bind(this));
@@ -74,6 +70,9 @@ export default class App extends React.Component {
             status: "connected",
         });
     }
+    reconnect() {
+        // TODO
+    }
     disconnect() {
         console.log("Disconnected");
         this.setState({
@@ -95,6 +94,13 @@ export default class App extends React.Component {
     }
 
     start(presentation) {
+        // TODO:
+        // window.addEventListener('beforeunload', function (e) {
+        //     // Cancel the event
+        //     e.preventDefault();
+        //     // Chrome requires returnValue to be set
+        //     e.returnValue = '';
+        // });
         if (this.state.member.type === "speaker") {
             sessionStorage.title = presentation.title;
         }
@@ -113,6 +119,13 @@ export default class App extends React.Component {
         this.setState({
             results: data,
         });
+    }
+
+    leave() {
+        // Reset state
+        this.member = {};
+        // Reset storage, use stringify to be explict for readablity
+        sessionStorage.member = JSON.stringify({});
     }
 
     render() {

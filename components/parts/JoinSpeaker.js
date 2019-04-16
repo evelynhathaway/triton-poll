@@ -2,45 +2,42 @@ import React from "react";
 
 
 export default class JoinSpeaker extends React.Component {
-    constructor(props) {
-        super(props);
+    committeeRef = React.createRef()
+    roomCodeRef = React.createRef()
 
-        this.speakerNameRef = React.createRef();
-        this.presentTitleRef = React.createRef();
-    }
+    createRoom() {
+        const committeeEle = this.committeeRef.current;
+        const roomCodeEle = this.roomCodeRef.current;
 
-    start() {
-        const speakerNameEle = this.speakerNameRef.current;
-        const presentTitleEle = this.presentTitleRef.current;
+        const committee = committeeEle.value;
+        const roomCode = roomCodeEle.value.toUpperCase();
 
-        const speakersName = speakerNameEle.value;
-        const presentTitle = presentTitleEle.value;
-
-        this.props.emit("start", {
-            name: speakersName,
-            title: presentTitle,
-        });
+        this.props.emit("create room", {committee, roomCode});
     }
 
     render() {
         return (
-            <form action="javascript:void(0)" onSubmit={this.start.bind(this)}>
-                <label>Full Name</label>
+            <form action="javascript:void(0)" onSubmit={this.createRoom.bind(this)}>
+                <label htmlFor="committee-input">Committee</label>
+                <p>This will be shown to students as the page title.</p>
                 <input
-                    ref={this.speakerNameRef}
+                    ref={this.committeeRef}
                     className="form-control"
-                    placeholder="enter your full name..."
+                    id="committee-input"
+                    placeholder="Committee"
                     required
                 />
 
-                <label>Presentation Title</label>
+                <label htmlFor="room-input">Room code</label>
+                <p>Used for joining as student. Optional, defaults to a random set of four letters to prevent unauthorized access. Case-insensitive.</p>
                 <input
-                    ref={this.presentTitleRef}
+                    ref={this.roomCodeRef}
                     className="form-control"
-                    placeholder="enter a title for this presentation..."
-                    required
+                    id="room-input"
+                    placeholder="Room code"
                 />
-                <button className="btn btn-primary">Join</button>
+
+                <button className="btn btn-primary">Create room</button>
             </form>
         );
     }

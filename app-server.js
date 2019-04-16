@@ -3,43 +3,123 @@ const _ = require("underscore");
 
 // here we'll store our connections...
 const connections = [];
-let title = "Default presentation title";
-const audience = [];
-let speaker = {};
 const questions = require("./app-questions");
-let currentQuestion = false;
-let results = {
-    a: 0,
-    b: 0,
-    c: 0,
-    d: 0,
+
+const roomStates = {};
+
+// TODO: move, comment
+let roomCodeLength = 4;
+const makeRoomCode = function (roomStates) {
+    let roomCode;
+    // This while loop will hang if there's few options left, but this is
+    // for one conference not thousands, so my lazy butt is okay for now lol
+    while (!roomCode || roomStates[roomCode]) {
+        // Get random uppercase code
+        roomCode = String.fromCharCode(
+            // Fill array with `roomCodeLength` number of random numbers corresponding
+            // to uppercase char codes, spread into `fromCharCode`'s ...args
+            ...Array(roomCodeLength)
+                .fill()
+                // Random number between 65 through 90, inclusive
+                .map(() => Math.round(Math.random() * 25) + 65)
+        );
+    }
+
+    return roomCode;
 };
 
+const makeRoom = function (roomStatess, roomCode, roomState) {
+    // Get room code from either provided (uppercased just in case) or make one
+    roomCode = (roomCode && roomCode.toUpperCase()) || makeRoomCode(roomStates);
+
+    // Initalize state for new room
+    roomStates[roomCode] = {
+        // Default committee
+        committee: "Triton MUN",
+        // Audience TODO: move to native sockets code?
+        audience: [],
+        // Speaker data
+        speaker: {},
+        // Initalize the current question
+        currentQuestion: false,
+        // Initalize the results
+        results: {
+            a: 0,
+            b: 0,
+            c: 0,
+            d: 0,
+        },
+
+        // Spread in overrides
+        ...roomState
+    };
+
+    // Return back generated room code
+    return roomCode;
+};
 
 const app = express();
-// TODO: serve React pages on routes
-app.use(express.static("./public"));
-app.use(express.static("./node_modules/bootstrap/dist"));
+app.use("/public", express.static("./public"));
+app.use("/bootstrap", express.static("./node_modules/bootstrap/dist"));
+app.get("/*", (request, response) => {
+    response.sendFile(__dirname + "/public/index.html");
+});
 
 const server = app.listen(3000);
+
 const io = require("socket.io").listen(server);
 
 // event handler for when a socket connects
 io.sockets.on("connection", function (socket) {
+    console.log(socket.id, connections)
+    // TODO: comment, make
+    socket.on("create room", function (payload) {
+        const {committee} = payload;
+        let {roomCode} = payload;
+
+        // Make new room, store room code if changed
+        roomCode = makeRoom(
+            // Pass in global state to mutate
+            roomStates,
+            // Code to use if provied one
+            roomCode,
+            // State to override defaults
+            {
+                committee,
+            },
+        );
+
+        // Mutate state for room
+        roomStates[roomCode].committee = committee;
+
+        // Send roomNumber to speaker, add them to the room
+        this.join(roomCode); // TODO: `socket`?
+    });
+
     //listening to join event from client side when someone joins presentation...
     socket.on("join", function (payload) {
+        const {countryName, roomCode} = payload;
+
+        if (!(roomCode in roomStates)) {
+            this.emit("incorrect room", roomCode);
+            return;
+        }
+
         const newMember = {
             id: this.id,
-            name: payload.name,
-            type: "audience",
+            countryName,
         };
 
-        audience.push(newMember);
-        console.log("Audience joined %s", payload.name);
+
+        roomStates[roomCode].audience.push(newMember);
+        console.log(`${countryName} joined room ${roomCode}`);
+
         //now we need to emit message to that client that we recieved payload with name of audience member...
         this.emit("joined", newMember);
+
+        // TODO: broadcast to speaker only
         //now we emit message to ALL audience members that new member is in... BROADCASTING EVENT
-        io.sockets.emit("audience", audience);
+        // io.sockets.emit("audience", audience);
     });
 
     //speaker starts event, info about name title of presentation is in payload
@@ -73,14 +153,15 @@ io.sockets.on("connection", function (socket) {
 
     // when new user connects send him title, audience, speaker variable content...
     // sending him an object with prop title,speaker,audience wich have title, speaker, audience variable as content...
-    socket.emit("welcome", {
-        title : title,
-        audience: audience,
-        speaker: speaker.name,
-        questions: questions,
-        currentQuestion: currentQuestion,
-        results: results,
-    });
+    // TODO: send less and per room
+    // socket.emit("welcome", {
+    //     title : committ,
+    //     audience: audience,
+    //     speaker: speaker.name,
+    //     questions: questions,
+    //     currentQuestion: currentQuestion,
+    //     results: results,
+    // });
 
     // push to connections array...
     connections.push(socket);
@@ -89,15 +170,26 @@ io.sockets.on("connection", function (socket) {
 
     // disconnect handler...
     socket.once("disconnect", function () {
+        for (const roomCode of this.nsp.rooms) {
+            roomStates[roomCode].audience = roomStates[roomCode].audience.filter(member => {
+                if (member.id !== this.id) {
+                    io.to(roomCode).sockets.emit("audience left", member);
+                    console.log(`${member.countryName} left room ${roomCode}`);
+                    return true;
+                }
+                return false;
+            });
+            io.to(roomCode).sockets.emit("audience", audience);
+        }
         // find a member of an audience that have the same id as currently diisconnecting socket...
         const member = _.findWhere(audience, {
             id: this.id,
         });
-        //if  member exists, remove it from audience array, broadcast new audience state, and log new data to console...
+        //if member exists, remove it from audience array, broadcast new audience state, and log new data to console...
+        // TODO: fix bug where opening two tabs on the speaker's browser and closing one triggers this
         if (member) {
             audience.splice(audience.indexOf(member), 1);
             io.sockets.emit("audience", audience);
-            console.log("Left: %s (%s audience members)", member.name, audience.length);
         } else if (this.id === speaker.id) {
             console.log("%s has left. '%s' is over!", speaker.name, title);
             speaker = {};
@@ -109,9 +201,9 @@ io.sockets.on("connection", function (socket) {
             });
         }
 
-        connections.splice(connections.indexOf(socket), 1);
+        // connections.splice(connections.indexOf(socket), 1);
         socket.disconnect();
-        console.log("Disconnected! %s sockets remaining", connections.length);
+        // console.log("Disconnected! %s sockets remaining", connections.length);
     });
 });
 
