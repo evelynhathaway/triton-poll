@@ -1,7 +1,10 @@
 import React from "react";
 import Display from "./Display";
+import {AppContext} from "../../app-context";
 
 export default class Ask extends React.Component {
+    static contextType = AppContext
+
     choices = []
     answer = undefined
 
@@ -24,12 +27,14 @@ export default class Ask extends React.Component {
     }
 
     select(choice) {
+        const {emit} = this.context.globalMethods;
+
         this.setState({
             answer: choice,
         });
         sessionStorage.answer = choice;
 
-        this.props.emit("answer", {
+        emit("answer", {
             question: this.props.question,
             choice: choice,
         });
@@ -50,6 +55,8 @@ export default class Ask extends React.Component {
     }
 
     render() {
+        const {status, member, audience, questions} = this.context.state;
+
         return (
             <div id="currentQuestion">
                 <Display if={this.state.answer}>

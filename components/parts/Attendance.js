@@ -1,6 +1,9 @@
 import React from "react";
+import {AppContext} from "../../app-context";
 
 export default class Attendance extends React.Component {
+    static contextType = AppContext
+
     addMemberRow(member, i) {
         return (
             <tr key={i}>
@@ -11,9 +14,11 @@ export default class Attendance extends React.Component {
     }
 
     render() {
+        const {audience} = this.context.state;
+
         return (
             <div>
-                <h2>Attendance - {this.props.audience.length} members</h2>
+                <h2>Attendance - {audience.length} members</h2>
                 <table className="table table-striped">
                     <thead>
                         <tr>
@@ -22,7 +27,7 @@ export default class Attendance extends React.Component {
                         </tr>
                     </thead>
                     <tbody>
-                        {this.props.audience.map(this.addMemberRow)}
+                        {audience.map(this.addMemberRow)}
                     </tbody>
                 </table>
             </div>

@@ -1,8 +1,13 @@
 import React from "react";
+import {AppContext} from "../../app-context";
 
 export default class Questions extends React.Component {
+    static contextType = AppContext
+
     ask(question) {
-        this.props.emit("ask", question);
+        const {emit} = this.context.globalMethods;
+
+        emit("ask", question);
     }
 
     addQuestion(question, i) {
@@ -14,10 +19,12 @@ export default class Questions extends React.Component {
     }
 
     render() {
+        const {questions} = this.context.state;
+
         return (
             <div id="questions" className="row">
                 <h2>Questions</h2>
-                {this.props.questions.map(this.addQuestion.bind(this))}
+                {questions.map(this.addQuestion.bind(this))}
             </div>
         );
     }

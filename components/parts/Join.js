@@ -1,19 +1,24 @@
 // TODO: if wrong room number
 
 import React from "react";
+import {AppContext} from "../../app-context";
 
 export default class Join extends React.Component {
+    static contextType = AppContext
+
     countryNameRef = React.createRef()
     roomCodeRef = React.createRef()
 
     join() {
+        const {emit} = this.context.globalMethods;
+
         const countryNameEle = this.countryNameRef.current;
         const roomCodeEle = this.roomCodeRef.current;
 
         const countryName = countryNameEle.value;
         const roomCode = roomCodeEle.value.toUpperCase();
 
-        this.props.emit("join", {countryName, roomCode});
+        emit("join", {countryName, roomCode});
     }
 
     render() {

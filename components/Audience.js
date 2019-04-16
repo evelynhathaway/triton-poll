@@ -2,25 +2,30 @@ import React from "react";
 import Display from "./parts/Display";
 import Join from "./parts/Join";
 import Ask from "./parts/Ask";
+import {AppContext} from "../app-context";
 
 export default class Audience extends React.Component {
+    static contextType = AppContext
+
     render() {
+        const {status, member, audience, currentQuestion} = this.context.state;
+
         return (
             <div>
-                <Display if={this.props.status === "connected"}>
-                    <Display if={this.props.member.countryName}>
-                        <Display if={!this.props.currentQuestion}>
-                            <h3>Welcome, {this.props.member.countryName}</h3>
-                            <p>{this.props.audience.length} audience members connected</p>
+                <Display if={status === "connected"}>
+                    <Display if={member.countryName}>
+                        <Display if={!currentQuestion}>
+                            <h3>Welcome, {member.countryName}</h3>
+                            <p>{audience.length} audience members connected</p>
                         </Display>
-                        <Display if={this.props.currentQuestion}>
-                            <Ask emit={this.props.emit} question={this.props.currentQuestion}/>
+                        <Display if={currentQuestion}>
+                            <Ask question={currentQuestion}/>
                         </Display>
                     </Display>
 
-                    <Display if={!this.props.member.countryName}>
+                    <Display if={!member.countryName}>
                         <h2>Join a room</h2>
-                        <Join emit={this.props.emit}/>
+                        <Join/>
                     </Display>
                 </Display>
             </div>

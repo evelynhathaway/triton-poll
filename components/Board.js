@@ -1,7 +1,10 @@
 import React from "react";
 import Display from "./parts/Display";
+import {AppContext} from "../app-context";
 
 export default class Board extends React.Component {
+    static contextType = AppContext
+
     barGraphData(results){
         return Object.keys(results).map((choice) => {
             return {
@@ -12,15 +15,17 @@ export default class Board extends React.Component {
     }
 
     render(){
+        const {status, currentQuestion, results} = this.context.state;
+
         return (
             <div id="scoreboard">
-                <Display if={this.props.status === "connected" && this.props.currentQuestion}>
-                    <h3>{this.props.currentQuestion.q}</h3>
-                    <h6>{JSON.stringify(this.props.results)}</h6>
+                <Display if={status === "connected" && currentQuestion}>
+                    <h3>{currentQuestion.q}</h3>
+                    <h6>{JSON.stringify(results)}</h6>
                 </Display>
 
 
-                <Display if={this.props.status === "connected" && !this.props.currentQuestion}>
+                <Display if={status === "connected" && !currentQuestion}>
                     <h3>Awaiting a question...</h3>
                 </Display>
             </div>

@@ -1,18 +1,23 @@
 import React from "react";
+import {AppContext} from "../../app-context";
 
 
 export default class JoinSpeaker extends React.Component {
+    static contextType = AppContext
+
     committeeRef = React.createRef()
     roomCodeRef = React.createRef()
 
     createRoom() {
+        const {emit} = this.context.globalMethods;
+
         const committeeEle = this.committeeRef.current;
         const roomCodeEle = this.roomCodeRef.current;
 
         const committee = committeeEle.value;
         const roomCode = roomCodeEle.value.toUpperCase();
 
-        this.props.emit("create room", {committee, roomCode});
+        emit("create room", {committee, roomCode});
     }
 
     render() {

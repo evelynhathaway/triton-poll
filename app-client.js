@@ -8,6 +8,7 @@ import Board from "./components/Board";
 import Speaker from "./components/Speaker";
 import Whoops404 from "./components/Whoops404";
 import Header from "./components/parts/Header";
+import {AppContext} from "./app-context";
 
 
 export default class App extends React.Component {
@@ -19,7 +20,7 @@ export default class App extends React.Component {
         questions: [],
         currentQuestion: false,
         results: {}, // TODO: IF speaker
-    };
+    }
 
     componentWillMount() {
         this.socket = io("http://localhost:3000"); // TODO: change on `env`: prod|dev
@@ -129,20 +130,28 @@ export default class App extends React.Component {
     }
 
     render() {
-        // Create bound copy of `this.emit` for child elements
-        const boundEmit = this.emit.bind(this);
 
         return (
             <div>
-                <Header {...this.state}/>
-                <Router>
-                    <Switch>
-                        <Route path="/" exact component={props => <Audience emit={boundEmit} {...this.state} {...props}/>}/>
-                        <Route path="/speaker/" component={props => <Speaker emit={boundEmit} {...this.state} {...props}/>}/>
-                        <Route path="/board/" component={props => <Board emit={boundEmit} {...this.state} {...props}/>}/>
-                        <Route component={props => <Whoops404 emit={boundEmit} {...this.state} {...props}/>}/>
-                    </Switch>
-                </Router>
+                <AppContext.Provider value={{
+                    // Allow access to state from this App component
+                    state: this.state,
+                    // Create bound copy of special methods for child elements
+                    globalMethods: {
+                        setState: this.setState.bind(this),
+                        emit: this.emit.bind(this),
+                    },
+                }}>
+                    <Header/>
+                    <Router>
+                        <Switch>
+                            <Route path="/" exact component={Audience}/>
+                            <Route path="/speaker/" component={Speaker}/>
+                            <Route path="/board/" component={Board}/>
+                            <Route component={Whoops404}/>
+                        </Switch>
+                    </Router>
+                </AppContext.Provider>
             </div>
         );
     }
