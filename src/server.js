@@ -2,61 +2,10 @@ const express = require("express");
 const SocketIO = require("socket.io");
 const path = require("path");
 
+const {makeRoom} = require("./make-room");
 
 const questions = require("./questions");
 
-const roomStates = {};
-
-// TODO: move, comment
-let roomCodeLength = 4;
-const makeRoomCode = function (roomStates) {
-    let roomCode;
-    // This while loop will hang if there's few options left, but this is
-    // for one conference not thousands, so my lazy butt is okay for now lol
-    while (!roomCode || roomStates[roomCode]) {
-        // Get random uppercase code
-        roomCode = String.fromCharCode(
-            // Fill array with `roomCodeLength` number of random numbers corresponding
-            // to uppercase char codes, spread into `fromCharCode`'s ...args
-            ...Array(roomCodeLength)
-                .fill()
-                // Random number between 65 through 90, inclusive
-                .map(() => Math.round(Math.random() * 25) + 65)
-        );
-    }
-
-    return roomCode;
-};
-
-const makeRoom = function (roomStates, roomCode, roomState) {
-    // Get room code from either provided (uppercased just in case) or make one
-    roomCode = (roomCode && roomCode.toUpperCase()) || makeRoomCode(roomStates);
-
-    // Initalize state for new room
-    roomStates[roomCode] = {
-        // Default committee
-        committee: "",
-        // Audience TODO: move to native sockets code?
-        audience: [],
-        // Speakers
-        speakers: [],
-        // Initalize the current question
-        currentQuestion: false,
-        // Initalize the results
-        results: {
-            a: 0,
-            b: 0,
-            c: 0,
-            d: 0,
-        },
-
-        // Spread in overrides
-        ...roomState
-    };
-
-    // Return back generated room code
-    return roomCode;
-};
 
 // Setup express app
 const app = express();
@@ -78,6 +27,9 @@ const io = SocketIO.listen(server);
 // Create namespaces for the audience and speakers
 const audienceNamespace = io.of('/audience');
 const speakerNamespace = io.of('/speaker');
+
+// Create object for the state for each room
+const roomStates = {};
 
 
 // Event handler for audience member connections
