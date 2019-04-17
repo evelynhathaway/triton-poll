@@ -1,4 +1,4 @@
-module.exports = [
+export default [
     {
         "q": "How much of your true potential are you using?",
         "a": "none of my true potential",

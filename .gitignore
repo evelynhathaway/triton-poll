@@ -1,6 +1,10 @@
+# Node
 node_modules
 
+# IDE
 \.idea/
 \.vscode/
 
+# Built files
 public/bundle\.js
+lib/

@@ -16,8 +16,9 @@ export default class Speaker extends React.Component {
     }
 
     componentWillMount() {
+        const socketAddress = (process.env.NODE_ENV === "development" ? "http://localhost:8080" : "") + "/speaker"
         // Create socket from `io`, assign to context
-        const socket = this.context.socket = io("http://localhost:3000/speaker"); // TODO: change on `env`: prod|dev
+        const socket = this.context.socket = io(socketAddress);
 
         socket.on("connect", this.context.connect.bind(this.context));
         socket.on("reconnect", this.context.reconnect.bind(this.context));

@@ -1,10 +1,13 @@
-const express = require("express");
-const SocketIO = require("socket.io");
-const path = require("path");
+import express from "express";
+import SocketIO from "socket.io";
+import path from "path";
 
-const {makeRoom} = require("./make-room");
+import {makeRoom} from "./make-room";
 
-const questions = require("./questions");
+import questions from "./questions";
+
+
+const DEVELOPMENT = process.env.NODE_ENV === "development";
 
 
 // Setup express app
@@ -20,7 +23,7 @@ app.get("/*", (request, response) => {
     response.sendFile("/index.html", {root: publicPath});
 });
 // Listen, create server
-const server = app.listen(3000);
+const server = app.listen(DEVELOPMENT ? 8080 : 80);
 
 // Create Socket.io server on express server instance
 const io = SocketIO.listen(server);
@@ -33,8 +36,8 @@ const roomStates = {};
 
 
 // Event handler for audience member connections
-audienceNamespace.on("connection", function (socket, callback) {
-    socket.on("join", function (payload) {
+audienceNamespace.on("connection", function (socket) {
+    socket.on("join", function (payload, callback) {
         const {countryName, roomCode} = payload;
 
         if (!(roomCode in roomStates)) {
@@ -161,4 +164,4 @@ speakerNamespace.on("connection", function (socket) {
 });
 
 
-console.log("Server is running at localhost:3000/");
+console.log(`Server is running at ${DEVELOPMENT ? "localhost:8080" : "yourserver.com"}/`);
