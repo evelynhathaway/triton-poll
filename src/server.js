@@ -1,10 +1,9 @@
 const express = require("express");
 const SocketIO = require("socket.io");
+const path = require("path");
 
 
-// here we'll store our connections...
-const connections = [];
-const questions = require("./app-questions");
+const questions = require("./questions");
 
 const roomStates = {};
 
@@ -59,15 +58,17 @@ const makeRoom = function (roomStates, roomCode, roomState) {
     return roomCode;
 };
 
-
 // Setup express app
 const app = express();
-// Serve static assets
-app.use("/public", express.static("./public"));
-app.use("/bootstrap", express.static("./node_modules/bootstrap/dist"));
+// Paths
+const publicPath = path.resolve(__dirname, "../public");
+const modulesPath = path.resolve(__dirname, "../node_modules");
+// Serve static assets first
+app.use("/bootstrap", express.static(modulesPath + "/bootstrap/dist"));
+app.use("/", express.static(publicPath));
 // Serve all routes as `index.html` for client-side routing
 app.get("/*", (request, response) => {
-    response.sendFile(__dirname + "/public/index.html");
+    response.sendFile("/index.html", {root: publicPath});
 });
 // Listen, create server
 const server = app.listen(3000);

@@ -1,5 +1,3 @@
-// TODO: if wrong room number
-
 import React from "react";
 import {AppContext} from "../contexts/app-context";
 

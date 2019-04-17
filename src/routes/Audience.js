@@ -1,10 +1,10 @@
 import React from "react";
 import io from "socket.io-client";
 
-import Display from "./parts/Display";
-import Join from "./parts/Join";
-import Ask from "./parts/Ask";
-import {AppContext} from "./contexts/app-context";
+import Display from "../components/util/Display";
+import Join from "../components/Join";
+import Ask from "../components/Ask";
+import {AppContext} from "../contexts/app-context";
 
 export default class Audience extends React.Component {
     static contextType = AppContext

@@ -23,7 +23,7 @@
   },
   "scripts": {
     "prestart": "webpack",
-    "start": "node app-server.js"
+    "start": "node ./src/server.js"
   },
   "repository": {
     "type": "git",

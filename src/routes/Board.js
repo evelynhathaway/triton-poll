@@ -1,6 +1,6 @@
 import React from "react";
-import Display from "./parts/Display";
-import {AppContext} from "./contexts/app-context";
+import Display from "../components/util/Display";
+import {AppContext} from "../contexts/app-context";
 
 export default class Board extends React.Component {
     static contextType = AppContext

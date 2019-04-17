@@ -2,12 +2,12 @@ import React from "react";
 import ReactDOM from "react-dom";
 import {BrowserRouter as Router, Switch, Route} from "react-router-dom";
 
-import Audience from "./components/Audience";
-import Board from "./components/Board";
-import Speaker from "./components/Speaker";
-import Whoops404 from "./components/Whoops404";
-import Header from "./components/parts/Header";
-import {AppContext} from "./components/contexts/app-context";
+import Audience from "./routes/Audience";
+import Board from "./routes/Board";
+import Speaker from "./routes/Speaker";
+import Whoops404 from "./routes/Whoops404";
+import Header from "./components/Header";
+import {AppContext} from "./contexts/app-context";
 
 const defaultState = {
     status: "disconnected",

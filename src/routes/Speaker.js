@@ -1,11 +1,11 @@
 import React from "react";
 import io from "socket.io-client";
 
-import Display from "./parts/Display";
-import JoinSpeaker from "./parts/JoinSpeaker";
-import Attendance from "./parts/Attendance";
-import Questions from "./parts/Questions";
-import {AppContext} from "./contexts/app-context";
+import Display from "../components/util/Display";
+import JoinSpeaker from "../components/JoinSpeaker";
+import Attendance from "../components/Attendance";
+import Questions from "../components/Questions";
+import {AppContext} from "../contexts/app-context";
 
 export default class Speaker extends React.Component {
     static contextType = AppContext
