@@ -1,12 +1,56 @@
 import React from "react";
+import io from "socket.io-client";
+
 import Display from "./parts/Display";
 import JoinSpeaker from "./parts/JoinSpeaker";
 import Attendance from "./parts/Attendance";
 import Questions from "./parts/Questions";
-import {AppContext} from "../app-context";
+import {AppContext} from "./contexts/app-context";
 
 export default class Speaker extends React.Component {
     static contextType = AppContext
+
+    state = {
+        audience: [],
+        results: {},
+    }
+
+    componentWillMount() {
+        // Create socket from `io`, assign to context
+        const socket = this.context.socket = io("http://localhost:3000/speaker"); // TODO: change on `env`: prod|dev
+
+        socket.on("connect", this.context.connect.bind(this.context));
+        socket.on("reconnect", this.context.reconnect.bind(this.context));
+        socket.on("disconnect", this.context.disconnect.bind(this.context));
+        socket.on("update state", this.context.updateState.bind(this.context));
+        socket.on("update speaker state", this.updateState.bind(this));
+        socket.on("joined", this.context.joined.bind(this.context));
+        socket.on("start", this.context.start.bind(this.context));
+        socket.on("end", this.context.updateState.bind(this.context));
+        socket.on("ask", this.context.ask.bind(this.context));
+    }
+
+    start(presentation) {
+        // TODO:
+        // window.addEventListener('beforeunload', function (e) {
+        //     // Cancel the event
+        //     e.preventDefault();
+        //     // Chrome requires returnValue to be set
+        //     e.returnValue = '';
+        // });
+        if (this.state.member.type === "speaker") {
+            sessionStorage.title = presentation.title;
+        }
+        this.setState(presentation);
+    }
+
+    ask(question) {
+        sessionStorage.answer = "";
+        this.setState({
+            currentQuestion: question,
+            results: {a: 0, b: 0, c: 0, d: 0},
+        });
+    }
 
     render() {
         const {status, member, audience, questions} = this.context.state;

@@ -1,11 +1,22 @@
 import React from "react";
+import io from "socket.io-client";
+
 import Display from "./parts/Display";
 import Join from "./parts/Join";
 import Ask from "./parts/Ask";
-import {AppContext} from "../app-context";
+import {AppContext} from "./contexts/app-context";
 
 export default class Audience extends React.Component {
     static contextType = AppContext
+
+    componentWillMount() {
+        // Create socket from `io`, assign to context
+        const socket = this.context.socket = io("http://localhost:3000/audience"); // TODO: change on `env`: prod|dev
+
+        socket.on("connect", this.context.connect.bind(this.context));
+        socket.on("reconnect", this.context.reconnect.bind(this.context));
+        socket.on("disconnect", this.context.disconnect.bind(this.context));
+    }
 
     render() {
         const {status, member, audience, currentQuestion} = this.context.state;

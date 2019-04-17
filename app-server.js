@@ -1,5 +1,6 @@
 const express = require("express");
-const _ = require("underscore");
+const SocketIO = require("socket.io");
+
 
 // here we'll store our connections...
 const connections = [];
@@ -28,18 +29,18 @@ const makeRoomCode = function (roomStates) {
     return roomCode;
 };
 
-const makeRoom = function (roomStatess, roomCode, roomState) {
+const makeRoom = function (roomStates, roomCode, roomState) {
     // Get room code from either provided (uppercased just in case) or make one
     roomCode = (roomCode && roomCode.toUpperCase()) || makeRoomCode(roomStates);
 
     // Initalize state for new room
     roomStates[roomCode] = {
         // Default committee
-        committee: "Triton MUN",
+        committee: "",
         // Audience TODO: move to native sockets code?
         audience: [],
-        // Speaker data
-        speaker: {},
+        // Speakers
+        speakers: [],
         // Initalize the current question
         currentQuestion: false,
         // Initalize the results
@@ -58,22 +59,83 @@ const makeRoom = function (roomStatess, roomCode, roomState) {
     return roomCode;
 };
 
+
+// Setup express app
 const app = express();
+// Serve static assets
 app.use("/public", express.static("./public"));
 app.use("/bootstrap", express.static("./node_modules/bootstrap/dist"));
+// Serve all routes as `index.html` for client-side routing
 app.get("/*", (request, response) => {
     response.sendFile(__dirname + "/public/index.html");
 });
-
+// Listen, create server
 const server = app.listen(3000);
 
-const io = require("socket.io").listen(server);
+// Create Socket.io server on express server instance
+const io = SocketIO.listen(server);
+// Create namespaces for the audience and speakers
+const audienceNamespace = io.of('/audience');
+const speakerNamespace = io.of('/speaker');
 
-// event handler for when a socket connects
-io.sockets.on("connection", function (socket) {
-    console.log(socket.id, connections)
-    // TODO: comment, make
-    socket.on("create room", function (payload) {
+
+// Event handler for audience member connections
+audienceNamespace.on("connection", function (socket, callback) {
+    socket.on("join", function (payload) {
+        const {countryName, roomCode} = payload;
+
+        if (!(roomCode in roomStates)) {
+            callback({error: `There's no session with the room code "${roomCode}"`});
+            return;
+        }
+
+        roomStates[roomCode].audience.push({
+            id: this.id,
+            countryName,
+        });
+
+        // Send inital state
+        callback({
+            // Spread in extracted state to send
+            state: {committee, currentQuestion} = roomStates[roomCode],
+        });
+
+        // Broadcast to speakers in room
+        speakerNamespace.to(roomCode).sockets.emit("audience joined", countryName);
+
+        console.log(`${countryName} joined room ${roomCode}`);
+    });
+
+    socket.on("answer", function (payload) {
+        results[payload.choice]++;
+        audienceNamespace.sockets.emit("results", results);
+        console.log("Answer: \"%s\" - %j", payload.choice, results);
+    });
+
+    // Disconnection handler
+    socket.once("disconnect", function () {
+        for (const roomCode of this.nsp.rooms) {
+            roomStates[roomCode].audience = roomStates[roomCode].audience.filter(member => {
+                if (member.id !== this.id) {
+                    speakerNamespace.to(roomCode).sockets.emit("audience left", member);
+                    console.log(`${member.countryName} left room ${roomCode}`);
+                    return true;
+                }
+                return false;
+            });
+            speakerNamespace.to(roomCode).sockets.emit("audience", audience);
+        }
+
+        socket.disconnect();
+    });
+
+    console.log("An audience member connected");
+});
+
+
+// Event handler for speaker connections
+speakerNamespace.on("connection", function (socket) {
+    socket.on("create room", function (payload, callback) {
         const {committee} = payload;
         let {roomCode} = payload;
 
@@ -89,123 +151,61 @@ io.sockets.on("connection", function (socket) {
             },
         );
 
-        // Mutate state for room
-        roomStates[roomCode].committee = committee;
+        console.log(`Room created: ${committee} (${roomCode})`);
 
-        // Send roomNumber to speaker, add them to the room
-        this.join(roomCode); // TODO: `socket`?
-    });
-
-    //listening to join event from client side when someone joins presentation...
-    socket.on("join", function (payload) {
-        const {countryName, roomCode} = payload;
-
-        if (!(roomCode in roomStates)) {
-            this.emit("incorrect room", roomCode);
-            return;
-        }
-
-        const newMember = {
-            id: this.id,
-            countryName,
-        };
-
-
-        roomStates[roomCode].audience.push(newMember);
-        console.log(`${countryName} joined room ${roomCode}`);
-
-        //now we need to emit message to that client that we recieved payload with name of audience member...
-        this.emit("joined", newMember);
-
-        // TODO: broadcast to speaker only
-        //now we emit message to ALL audience members that new member is in... BROADCASTING EVENT
-        // io.sockets.emit("audience", audience);
+        // Send roomCode to speaker for them to join the room
+        callback(roomCode);
     });
 
     //speaker starts event, info about name title of presentation is in payload
-    socket.on("start", function (payload) {
-        speaker.name = payload.name;
-        speaker.id = this.id;
-        speaker.type = "speaker";
-        title = payload.title;
+    socket.on("join", function (payload) {
+        const {roomCode} = payload;
 
-        this.emit("joined", speaker);
-        //broadcast app state to all audience members that are already logged in...
-        io.sockets.emit("start", {
-            title: title,
-            speaker: speaker.name,
-        });
-        console.log("Presentation Started: \"%s\" by %s", title, speaker.name);
+        roomStates[roomCode].speakers.push(this.id);
+        speakerNamespace.to(roomCode).emit("speaker joined");
+        console.log(`A speaker joined ${committee} (${roomCode})`);
     });
 
     socket.on("ask", function (question) {
-        currentQuestion = question;
-        results = {a:0, b:0, c:0, d:0};
-        io.sockets.emit("ask", currentQuestion);
-        console.log("Question asked \"%s\"", question.q);
+        roomStates[roomCode].currentQuestion = question;
+        roomStates[roomCode].results = {a: 0, b: 0, c: 0, d: 0};
+        audienceNamespace.sockets.emit("ask", question);
+        console.log(`"${question.q}" asked in ${roomCode}`);
     });
 
-    socket.on("answer", function (payload) {
-        results[payload.choice]++;
-        io.sockets.emit("results", results);
-        console.log("Answer: \"%s\" - %j", payload.choice, results);
-    });
-
-    // when new user connects send him title, audience, speaker variable content...
-    // sending him an object with prop title,speaker,audience wich have title, speaker, audience variable as content...
-    // TODO: send less and per room
-    // socket.emit("welcome", {
-    //     title : committ,
-    //     audience: audience,
-    //     speaker: speaker.name,
-    //     questions: questions,
-    //     currentQuestion: currentQuestion,
-    //     results: results,
-    // });
-
-    // push to connections array...
-    connections.push(socket);
-    console.log("Connected: %s sockets connected", connections.length);
-
-
-    // disconnect handler...
+    // Disconnection handler
+    // TODO
     socket.once("disconnect", function () {
         for (const roomCode of this.nsp.rooms) {
             roomStates[roomCode].audience = roomStates[roomCode].audience.filter(member => {
                 if (member.id !== this.id) {
-                    io.to(roomCode).sockets.emit("audience left", member);
+                    speakerNamespace.to(roomCode).sockets.emit("audience left", member);
                     console.log(`${member.countryName} left room ${roomCode}`);
                     return true;
                 }
                 return false;
             });
-            io.to(roomCode).sockets.emit("audience", audience);
-        }
-        // find a member of an audience that have the same id as currently diisconnecting socket...
-        const member = _.findWhere(audience, {
-            id: this.id,
-        });
-        //if member exists, remove it from audience array, broadcast new audience state, and log new data to console...
-        // TODO: fix bug where opening two tabs on the speaker's browser and closing one triggers this
-        if (member) {
-            audience.splice(audience.indexOf(member), 1);
-            io.sockets.emit("audience", audience);
-        } else if (this.id === speaker.id) {
-            console.log("%s has left. '%s' is over!", speaker.name, title);
-            speaker = {};
-            title = "Untitled presentation";
-            io.sockets.emit("end", {
-                title: title,
-                speaker : "",
-                audience: audience,
-            });
+            speakerNamespace.to(roomCode).sockets.emit("audience", audience);
         }
 
-        // connections.splice(connections.indexOf(socket), 1);
         socket.disconnect();
-        // console.log("Disconnected! %s sockets remaining", connections.length);
     });
+
+    // Emit welcome on load to send inital state
+    socket.emit("welcome", {
+        // Create an array of rooms for the client to display if wanting to join an existing room
+        rooms: Object.keys(roomStates).map(roomCode => {
+            return {
+                // Room code
+                roomCode,
+                // Spread in extracted state to send
+                ...{committee} = roomStates[roomCode],
+            }
+        }),
+    });
+
+    console.log("A speaker connected");
 });
 
 
-console.log("Polling server is running at localhost:3000/ ");
+console.log("Server is running at localhost:3000/");

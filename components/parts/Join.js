@@ -1,7 +1,7 @@
 // TODO: if wrong room number
 
 import React from "react";
-import {AppContext} from "../../app-context";
+import {AppContext} from "../contexts/app-context";
 
 export default class Join extends React.Component {
     static contextType = AppContext

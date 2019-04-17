@@ -1,5 +1,5 @@
 import React from "react";
-import {AppContext} from "../../app-context";
+import {AppContext} from "../contexts/app-context";
 
 
 export default class JoinSpeaker extends React.Component {
@@ -15,9 +15,32 @@ export default class JoinSpeaker extends React.Component {
         const roomCodeEle = this.roomCodeRef.current;
 
         const committee = committeeEle.value;
-        const roomCode = roomCodeEle.value.toUpperCase();
+        const roomCode = roomCodeEle.value;
 
-        socket.emit("create room", {committee, roomCode});
+        // Create room on server
+        socket.emit(
+            "create room",
+            {committee, roomCode},
+            // Handle response
+            ({roomCode, error}) => {
+                // Alert if error
+                if (error) {
+                    return alert(error);
+                }
+
+                // Otherwise join the new room
+                // - Uses the server roomCode for normalization and fallback on random
+                this.joinRoom(roomCode);
+            },
+        );
+    }
+
+    joinRoom(roomCode) {
+        const {socket} = this.context;
+
+        socket.join(roomCode);
+
+        // TODO: populate state to global as speaker
     }
 
     render() {

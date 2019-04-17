@@ -1,5 +1,5 @@
 import React from "react";
-import {AppContext} from "../../app-context";
+import {AppContext} from "../contexts/app-context";
 
 export default class Questions extends React.Component {
     static contextType = AppContext

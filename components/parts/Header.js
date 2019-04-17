@@ -1,6 +1,6 @@
 import React from "react";
 import Display from "./Display";
-import {AppContext} from "../../app-context";
+import {AppContext} from "../contexts/app-context";
 
 export default class Header extends React.Component {
     static contextType = AppContext

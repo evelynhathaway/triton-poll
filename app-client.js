@@ -1,39 +1,26 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import {BrowserRouter as Router, Switch, Route} from "react-router-dom";
-import io from "socket.io-client";
 
 import Audience from "./components/Audience";
 import Board from "./components/Board";
 import Speaker from "./components/Speaker";
 import Whoops404 from "./components/Whoops404";
 import Header from "./components/parts/Header";
-import {AppContext} from "./app-context";
+import {AppContext} from "./components/contexts/app-context";
 
+const defaultState = {
+    status: "disconnected",
+    committee: undefined,
+    roomCode: undefined,
+    member: {},
+    questions: [],
+    currentQuestion: undefined,
+}
 
 export default class App extends React.Component {
     state = {
-        status: "disconnected",
-        committee: "",
-        member: {},
-        audience: [], // TODO: IF speaker
-        questions: [],
-        currentQuestion: false,
-        results: {}, // TODO: IF speaker
-    }
-
-    componentWillMount() {
-        this.socket = io("http://localhost:3000"); // TODO: change on `env`: prod|dev
-        this.socket.on("connect", this.connect.bind(this));
-        this.socket.on("reconnect", this.reconnect.bind(this));
-        this.socket.on("disconnect", this.disconnect.bind(this));
-        this.socket.on("welcome", this.updateState.bind(this));
-        this.socket.on("joined", this.joined.bind(this));
-        this.socket.on("audience", this.updateAudience.bind(this));
-        this.socket.on("start", this.start.bind(this));
-        this.socket.on("end", this.updateState.bind(this));
-        this.socket.on("ask", this.ask.bind(this));
-        this.socket.on("results", this.updateResults.bind(this));
+        ...defaultState,
     }
 
     joined(member) {
@@ -71,11 +58,8 @@ export default class App extends React.Component {
         // TODO
     }
     disconnect() {
-        console.log("Disconnected");
         this.setState({
             status: "disconnected",
-            title: "disconnected",
-            speaker: "",
         });
     }
 
@@ -84,61 +68,27 @@ export default class App extends React.Component {
         this.setState(serverState);
     }
 
-    updateAudience(audienceArray) {
-        this.setState({
-            audience: audienceArray
-        });
-    }
-
-    start(presentation) {
-        // TODO:
-        // window.addEventListener('beforeunload', function (e) {
-        //     // Cancel the event
-        //     e.preventDefault();
-        //     // Chrome requires returnValue to be set
-        //     e.returnValue = '';
-        // });
-        if (this.state.member.type === "speaker") {
-            sessionStorage.title = presentation.title;
-        }
-        this.setState(presentation);
-    }
-
-    ask(question) {
-        sessionStorage.answer = "";
-        this.setState({
-            currentQuestion: question,
-            results : {a:0, b:0, c:0, d:0},
-        });
-    }
-
-    updateResults(data) {
-        this.setState({
-            results: data,
-        });
-    }
-
     leave() {
-        // Reset state
-        this.member = {};
-        // Reset storage, use stringify to be explict for readablity
-        sessionStorage.member = JSON.stringify({});
+        // Reset member state
+        this.setState({
+            ...{
+                member,
+                roomCode,
+                currentQuestion,
+                committee,
+            } = defaultState,
+        });
+
+        // Reset storage
+        sessionStorage.member = defaultState.member;
+        sessionStorage.roomCode = defaultState.roomCode;
     }
 
     render() {
 
         return (
             <div>
-                <AppContext.Provider value={{
-                    // Expose socket
-                    socket: this.socket,
-                    // Allow access to state from this App component
-                    state: this.state,
-                    // Create bound copy of special methods for child elements
-                    globalMethods: {
-                        setState: this.setState.bind(this),
-                    },
-                }}>
+                <AppContext.Provider value={this}>
                     <Header/>
                     <Router>
                         <Switch>
