@@ -1,48 +1,72 @@
 import React from "react";
 import io from "socket.io-client";
 
-import Display from "../components/util/Display";
 import JoinSpeaker from "../components/JoinSpeaker";
 import Attendance from "../components/Attendance";
 import Questions from "../components/Questions";
+import Header from "../components/Header";
+
 import {AppContext} from "../contexts/app-context";
+import {SpeakerContext} from "../contexts/speaker-context";
+
 
 export default class Speaker extends React.Component {
     static contextType = AppContext
 
     state = {
+        status: "disconnected",
         audience: [],
-        results: {},
     }
 
-    componentWillMount() {
+    componentDidMount() {
         const socketAddress = (process.env.NODE_ENV === "development" ? "http://localhost:8080" : "") + "/speaker"
         // Create socket from `io`, assign to context
-        const socket = this.context.socket = io(socketAddress);
+        this.socket = io(socketAddress);
 
-        socket.on("connect", this.context.connect.bind(this.context));
-        socket.on("reconnect", this.context.reconnect.bind(this.context));
-        socket.on("disconnect", this.context.disconnect.bind(this.context));
-        socket.on("update state", this.context.updateState.bind(this.context));
-        socket.on("update speaker state", this.updateState.bind(this));
-        socket.on("joined", this.context.joined.bind(this.context));
-        socket.on("start", this.context.start.bind(this.context));
-        socket.on("end", this.context.updateState.bind(this.context));
-        socket.on("ask", this.context.ask.bind(this.context));
+        this.socket.on("connect", this.connect.bind(this));
+        this.socket.on("disconnect", this.disconnect.bind(this));
+        this.socket.on("update state", this.updateState.bind(this));
+        this.socket.on("ask", this.ask.bind(this));
     }
 
-    start(presentation) {
-        // TODO:
-        // window.addEventListener('beforeunload', function (e) {
-        //     // Cancel the event
-        //     e.preventDefault();
-        //     // Chrome requires returnValue to be set
-        //     e.returnValue = '';
-        // });
-        if (this.state.member.type === "speaker") {
-            sessionStorage.title = presentation.title;
+    componentWillUnmount() {
+        this.socket.disconnect();
+    }
+
+    updateState(state) {
+        // Store room if set
+        if (typeof state.roomCode !== "undefined") {
+            sessionStorage.roomCode = state.roomCode;
         }
-        this.setState(presentation);
+
+        // Forward to React
+        this.setState(state);
+    }
+
+    connect() {
+        const {roomCode} = sessionStorage;
+
+        if (roomCode) {
+            this.join({roomCode});
+        }
+
+        this.setState({
+            status: "connected",
+        });
+    }
+    disconnect() {
+        this.setState({
+            status: "disconnected",
+        });
+    }
+
+    join({roomCode}) {
+        // Ask server to join as a speaker in `roomCode`
+        this.socket.emit("join", {roomCode}, error => alert(error));
+    }
+    leave() {
+        // Ask server to leave `roomCode`
+        this.socket.emit("leave", {roomCode: this.state.roomCode});
     }
 
     ask(question) {
@@ -54,22 +78,25 @@ export default class Speaker extends React.Component {
     }
 
     render() {
-        const {status, member, audience, questions} = this.context.state;
+        const {status, roomCode} = this.state;
 
         return (
-            <div>
-                <Display if={status === "connected"}>
-                    <Display if={member.name && member.type === "speaker"}>
-                        <Questions questions={questions}/>
-                        <Attendance audience={audience}/>
-                    </Display>
-
-                    <Display if={!member.name}>
-                        <h2>Create a room</h2>
-                        <JoinSpeaker/>
-                    </Display>
-                </Display>
-            </div>
+            <SpeakerContext.Provider value={this}>
+                <Header state={this.state} leave={this.leave.bind(this)}/>
+                {
+                    status === "connected" &&
+                    (
+                        roomCode && (
+                            <>
+                                <Questions/>
+                                <Attendance/>
+                            </>
+                        ) || (
+                            <JoinSpeaker/>
+                        )
+                    )
+                }
+            </SpeakerContext.Provider>
         );
     }
 };

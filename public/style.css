@@ -66,3 +66,7 @@ form a {
     opacity: 0.9;
 }
 
+.table td,
+.table th {
+    vertical-align: middle;
+}

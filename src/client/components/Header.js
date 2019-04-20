@@ -1,27 +1,23 @@
 import React from "react";
-import Display from "./util/Display";
 import {AppContext} from "../contexts/app-context";
 
 export default class Header extends React.Component {
     static contextType = AppContext
 
     render() {
-        const {status, member, committee, roomCode} = this.context.state;
+        const {leave} = this.props;
+        const {status, committee, roomCode} = this.props.state;
 
         return (
             <header className="row">
-                <Display if={member}>
-                    <div className="col-xs-10">
-                        <h1>{committee}</h1>
-                        <p>{roomCode}</p>
-                    </div>
-                </Display>
-
-                <Display if={status !== "connected"}>
-                    <div className="col-xs-2">
-                        <span id="connection-status">Disconnected</span>
-                    </div>
-                </Display>
+                <div className="col-xs-10">
+                    {committee && <h1>{committee}</h1>}
+                    {roomCode && <p>{roomCode}</p>}
+                    {roomCode && leave && <button className="btn btn-outline-dark" onClick={leave}>Leave</button>}
+                </div>
+                <div className="col-xs-2">
+                    {status !== "connected" && <span id="connection-status">Disconnected</span>}
+                </div>
             </header>
         );
     }

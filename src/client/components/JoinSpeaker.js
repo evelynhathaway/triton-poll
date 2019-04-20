@@ -1,12 +1,27 @@
 import React from "react";
-import {AppContext} from "../contexts/app-context";
+import {SpeakerContext} from "../contexts/speaker-context";
 
 
 export default class JoinSpeaker extends React.Component {
-    static contextType = AppContext
+    static contextType = SpeakerContext
+
+    state = {
+        rooms: [],
+    }
 
     committeeRef = React.createRef()
     roomCodeRef = React.createRef()
+
+    componentDidMount() {
+        this.listRooms();
+    }
+
+    listRooms() {
+        const {socket} = this.context;
+
+        // List rooms and add to state
+        socket.emit("list rooms", this.setState.bind(this));
+    }
 
     createRoom() {
         const {socket} = this.context;
@@ -17,56 +32,65 @@ export default class JoinSpeaker extends React.Component {
         const committee = committeeEle.value;
         const roomCode = roomCodeEle.value;
 
-        // Create room on server
-        socket.emit(
-            "create room",
-            {committee, roomCode},
-            // Handle response
-            ({roomCode, error}) => {
-                // Alert if error
-                if (error) {
-                    return alert(error);
-                }
-
-                // Otherwise join the new room
-                // - Uses the server roomCode for normalization and fallback on random
-                this.joinRoom(roomCode);
-            },
-        );
-    }
-
-    joinRoom(roomCode) {
-        const {socket} = this.context;
-
-        socket.join(roomCode);
-
-        // TODO: populate state to global as speaker
+        // Create room on server, then join
+        socket.emit("create room", {committee, roomCode, join: true}, error => alert(error));
     }
 
     render() {
+        const {rooms} = this.state;
+
         return (
-            <form action="javascript:void(0)" onSubmit={this.createRoom.bind(this)}>
-                <label htmlFor="committee-input">Committee</label>
-                <p>This will be shown to students as the page title.</p>
-                <input
-                    ref={this.committeeRef}
-                    className="form-control"
-                    id="committee-input"
-                    placeholder="Committee"
-                    required
-                />
+            <div>
+                <h2 className="mt-6">Join a room</h2>
+                <div className="table-responsive">
+                    <table className="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Committee</th>
+                                <th>Room Code</th>
+                                <th>Join</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {rooms.map((room, index) => (
+                                <tr key={index}>
+                                    <td>{room.committee}</td>
+                                    <td>{room.roomCode}</td>
+                                    <td>
+                                        <button className="btn btn-outline-dark" onClick={() => this.context.join.call(this.context, room)}>Join</button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
 
-                <label htmlFor="room-input">Room code</label>
-                <p>Used for joining as student. Optional, defaults to a random set of four letters to prevent unauthorized access. Case-insensitive.</p>
-                <input
-                    ref={this.roomCodeRef}
-                    className="form-control"
-                    id="room-input"
-                    placeholder="Room code"
-                />
+                <hr className="mtb-6"></hr>
 
-                <button className="btn btn-primary">Create room</button>
-            </form>
+                <h2 className="mt-6">Create a room</h2>
+                <form action="javascript:void(0)" onSubmit={this.createRoom.bind(this)}>
+                    <label htmlFor="committee-input">Committee</label>
+                    <p>This will be shown to students as the page title.</p>
+                    <input
+                        ref={this.committeeRef}
+                        className="form-control"
+                        id="committee-input"
+                        placeholder="Committee"
+                        required
+                    />
+
+                    <label htmlFor="room-input">Room code</label>
+                    <p>Used for joining as student. Optional, defaults to a random set of four letters to prevent unauthorized access. Case-insensitive.</p>
+                    <input
+                        ref={this.roomCodeRef}
+                        className="form-control"
+                        id="room-input"
+                        placeholder="Room code"
+                    />
+
+                    <button className="btn btn-primary">Create room</button>
+                </form>
+            </div>
         );
     }
 };

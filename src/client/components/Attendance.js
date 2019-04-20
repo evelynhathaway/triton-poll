@@ -1,14 +1,13 @@
 import React from "react";
-import {AppContext} from "../contexts/app-context";
+import {SpeakerContext} from "../contexts/speaker-context";
 
 export default class Attendance extends React.Component {
-    static contextType = AppContext
+    static contextType = SpeakerContext
 
     addMemberRow(member, i) {
         return (
             <tr key={i}>
-                <td>{member.name}</td>
-                <td>{member.id}</td>
+                <td>{member.countryName}</td>
             </tr>
         );
     }
@@ -18,18 +17,19 @@ export default class Attendance extends React.Component {
 
         return (
             <div>
-                <h2>Attendance - {audience.length} members</h2>
-                <table className="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>Audience members</th>
-                            <th>Socket ID</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {audience.map(this.addMemberRow)}
-                    </tbody>
-                </table>
+                <h2>Attendance - {audience.length} member{audience.length === 1 ? "" : "s"}</h2>
+                <div className="table-responsive">
+                    <table className="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Countries connected</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {audience.map(this.addMemberRow)}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         );
     }

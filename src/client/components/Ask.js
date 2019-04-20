@@ -8,7 +8,7 @@ export default class Ask extends React.Component {
     choices = []
     answer = undefined
 
-    componentWillMount() {
+    componentDidMount() {
         this.setUpChoices();
     }
 

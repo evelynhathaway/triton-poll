@@ -1,8 +1,8 @@
 import React from "react";
-import {AppContext} from "../contexts/app-context";
+import {SpeakerContext} from "../contexts/speaker-context";
 
 export default class Questions extends React.Component {
-    static contextType = AppContext
+    static contextType = SpeakerContext
 
     ask(question) {
         const {socket} = this.context;
@@ -24,7 +24,7 @@ export default class Questions extends React.Component {
         return (
             <div id="questions" className="row">
                 <h2>Questions</h2>
-                {questions.map(this.addQuestion.bind(this))}
+                {/* {questions.map(this.addQuestion.bind(this))} */}
             </div>
         );
     }

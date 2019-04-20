@@ -1,9 +1,11 @@
+import {roomStates} from "./index";
+import {getAudience, getSpeakers} from "./util";
+
+
 // The length of randomly created room codes
 const roomCodeLength = 4;
-
-
 // Make a random, available room code of four letters
-export const makeRoomCode = function (roomStates) {
+export const makeRoomCode = function () {
     let roomCode;
     // This while loop will hang if there's few options left, but this is
     // for one conference not thousands, so my lazy butt is okay for now lol
@@ -24,18 +26,14 @@ export const makeRoomCode = function (roomStates) {
 
 // Initalize a room in the `roomStates` object
 // - Room code and inital state are optional
-export const makeRoom = function (roomStates, roomCode, initalState = {}) {
+export const makeRoom = function (roomCode = makeRoomCode(), initalState = {}) {
     // Get room code from either provided (uppercased) or make one
-    roomCode = (roomCode && roomCode.toUpperCase()) || makeRoomCode(roomStates);
+    roomCode = roomCode.toUpperCase();
 
     // Initalize state for new room
     roomStates[roomCode] = {
         // Default committee
         committee: "",
-        // Audience TODO: move to native sockets code?
-        audience: [],
-        // Speakers
-        speakers: [],
         // Initalize the current question
         currentQuestion: false,
         // Initalize the results
@@ -49,6 +47,19 @@ export const makeRoom = function (roomStates, roomCode, initalState = {}) {
         // Spread in overrides
         ...initalState
     };
+
+    // Make getters and setters for audience and speaker arrays
+    // - From the global `socketData` WeakMap
+    Object.defineProperties(roomStates[roomCode], {
+        audience: {
+            get: getAudience,
+            enumerable: true,
+        },
+        speakers: {
+            get: getSpeakers,
+            enumerable: true,
+        },
+    })
 
     // Return back capitalized/generated room code
     return roomCode;
