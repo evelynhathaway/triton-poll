@@ -1,5 +1,5 @@
 import React from "react";
-import {AudienceContext} from "../contexts/audience-context";
+import {AudienceContext} from "../../contexts";
 
 
 export default class Join extends React.Component {
@@ -19,6 +19,8 @@ export default class Join extends React.Component {
     }
 
     render() {
+        const {roomCode} = this.context.state;
+
         return (
             <div>
                 <h2>Join a room</h2>
@@ -42,6 +44,7 @@ export default class Join extends React.Component {
                         id="room-input"
                         placeholder="Room code"
                         required
+                        value={roomCode ? roomCode : ""}
                     />
 
                     <button className="btn btn-primary">Join</button>

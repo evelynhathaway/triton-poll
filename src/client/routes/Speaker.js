@@ -1,13 +1,11 @@
 import React from "react";
 import io from "socket.io-client";
 
-import JoinSpeaker from "../components/JoinSpeaker";
-import Attendance from "../components/Attendance";
-import Questions from "../components/Questions";
-import Header from "../components/Header";
-
-import {AppContext} from "../contexts/app-context";
-import {SpeakerContext} from "../contexts/speaker-context";
+import Join from "../components/speaker/Join";
+import Voting from "../components/speaker/Voting";
+import Placards from "../components/speaker/Placards";
+import Attendance from "../components/speaker/Attendance";
+import {AppContext, SpeakerContext} from "../contexts";
 
 
 export default class Speaker extends React.Component {
@@ -16,17 +14,25 @@ export default class Speaker extends React.Component {
     state = {
         status: "disconnected",
         audience: [],
+        roomCode: sessionStorage.roomCode,
+        votes: {
+            get total() {
+                return Object.keys(this).reduce((accumulator, key) => key !== "total" && accumulator + (this[key].amount || 0), 0);
+            },
+            yes: 0,
+            no: 0,
+            abstain: 0,
+        },
     }
 
     componentDidMount() {
-        const socketAddress = (process.env.NODE_ENV === "development" ? "http://localhost:8080" : "") + "/speaker"
+        const socketAddress = (process.env.NODE_ENV === "development" ? "http://192.168.86.2:8080" : "") + "/speaker";
         // Create socket from `io`, assign to context
         this.socket = io(socketAddress);
 
         this.socket.on("connect", this.connect.bind(this));
         this.socket.on("disconnect", this.disconnect.bind(this));
         this.socket.on("update state", this.updateState.bind(this));
-        this.socket.on("ask", this.ask.bind(this));
     }
 
     componentWillUnmount() {
@@ -44,7 +50,7 @@ export default class Speaker extends React.Component {
     }
 
     connect() {
-        const {roomCode} = sessionStorage;
+        const {roomCode} = this.state;
 
         if (roomCode) {
             this.join({roomCode});
@@ -69,30 +75,25 @@ export default class Speaker extends React.Component {
         this.socket.emit("leave", {roomCode: this.state.roomCode});
     }
 
-    ask(question) {
-        sessionStorage.answer = "";
-        this.setState({
-            currentQuestion: question,
-            results: {a: 0, b: 0, c: 0, d: 0},
-        });
-    }
-
     render() {
         const {status, roomCode} = this.state;
 
         return (
             <SpeakerContext.Provider value={this}>
-                <Header state={this.state} leave={this.leave.bind(this)}/>
                 {
                     status === "connected" &&
                     (
                         roomCode && (
                             <>
-                                <Questions/>
+                                {/* Voting actions and summary */}
+                                <Voting/>
+                                {/* Placards raised */}
+                                <Placards/>
+                                {/* Attendance and voting breakdown */}
                                 <Attendance/>
                             </>
                         ) || (
-                            <JoinSpeaker/>
+                            <Join/>
                         )
                     )
                 }

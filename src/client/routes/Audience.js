@@ -1,13 +1,10 @@
 import React from "react";
 import io from "socket.io-client";
 
-import Display from "../components/util/Display";
-import Join from "../components/Join";
-import Ask from "../components/Ask";
-import Header from "../components/Header";
-
-import {AppContext} from "../contexts/app-context";
-import {AudienceContext} from "../contexts/audience-context";
+import Join from "../components/audience/Join";
+import Placard from "../components/audience/Placard";
+import Voting from "../components/audience/Voting";
+import {AppContext, AudienceContext} from "../contexts";
 
 
 export default class Audience extends React.Component {
@@ -15,10 +12,12 @@ export default class Audience extends React.Component {
 
     state = {
         status: "disconnected",
+        roomCode: sessionStorage.roomCode,
+        countryName: sessionStorage.countryName,
     }
 
     componentDidMount() {
-        const socketAddress = (process.env.NODE_ENV === "development" ? "http://localhost:8080" : "") + "/audience"
+        const socketAddress = (process.env.NODE_ENV === "development" ? "http://192.168.86.2:8080" : "") + "/audience";
         // Create socket from `io`, assign to context
         this.socket = io(socketAddress);
 
@@ -45,7 +44,7 @@ export default class Audience extends React.Component {
     }
 
     connect() {
-        const {roomCode, countryName} = sessionStorage;
+        const {roomCode, countryName} = this.state;
 
         if (roomCode && countryName) {
             this.join({countryName, roomCode});
@@ -71,28 +70,23 @@ export default class Audience extends React.Component {
     }
 
     render() {
-        const {status, countryName, roomCode, currentQuestion} = this.state;
+        const {status, countryName, roomCode} = this.state;
 
         return (
-            <div>
-                <AudienceContext.Provider value={this}>
-                    <Header state={this.state} leave={this.leave.bind(this)}/>
-                    <Display if={status === "connected"}>
-                        <Display if={countryName && roomCode}>
-                            <Display if={!currentQuestion}>
-                                <h3>Welcome, {countryName}</h3>
-                            </Display>
-                            <Display if={currentQuestion}>
-                                <Ask question={currentQuestion}/>
-                            </Display>
-                        </Display>
-
-                        <Display if={!roomCode}>
+            <AudienceContext.Provider value={this}>
+                {
+                    status === "connected" && (
+                        roomCode && countryName && (
+                            <>
+                                <Placard/>
+                                <Voting/>
+                            </>
+                        ) || (
                             <Join/>
-                        </Display>
-                    </Display>
-                </AudienceContext.Provider>
-            </div>
+                        )
+                    )
+                }
+            </AudienceContext.Provider>
         );
     }
-};
+}

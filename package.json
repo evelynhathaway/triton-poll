@@ -2,7 +2,7 @@
   "name": "triton-poll",
   "version": "1.0.0",
   "private": true,
-  "description": "",
+  "description": "Live virtual voting and placard rasing for Triton MUN",
   "homepage": "https://github.com/evelynhathaway/triton-poll#readme",
   "bugs": {
     "url": "https://github.com/evelynhathaway/triton-poll/issues"
@@ -25,6 +25,7 @@
     "dev": "cross-env NODE_ENV=development run-p -l build:watch dev:start",
     "dev:start": "npm run build:server && cross-env NODE_ENV=development node ./lib/index.js",
     "dev:sync": "browser-sync start --proxy \"localhost:8080\" --files \"public/*\"",
+    "lint": "eslint --ext .js ./",
     "prestart": "cross-env NODE_ENV=production run-p --aggregate-output build:client build:server",
     "start": "cross-env NODE_ENV=production node ./lib/index.js"
   },
@@ -34,6 +35,7 @@
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-router-dom": "^5.0.0",
+    "react-timeago": "^4.4.0",
     "socket.io": "^2.2.0",
     "socket.io-client": "^2.2.0"
   },
@@ -44,12 +46,16 @@
     "@babel/plugin-proposal-optional-chaining": "^7.2.0",
     "@babel/preset-env": "^7.4.3",
     "@babel/preset-react": "^7.0.0",
+    "babel-eslint": "^10.0.1",
     "babel-loader": "^8.0.5",
     "babel-plugin-transform-node-env-inline": "^0.4.3",
-    "browser-sync": "^2.26.3",
+    "browser-sync": "^2.26.4",
     "cross-env": "^5.2.0",
+    "eslint": "^5.16.0",
+    "eslint-plugin-evelyn": "0.0.0",
+    "eslint-plugin-node": "^8.0.1",
     "npm-run-all": "^4.1.5",
     "webpack": "^4.30.0",
-    "webpack-cli": "^3.3.0"
+    "webpack-cli": "^3.3.1"
   }
 }

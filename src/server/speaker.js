@@ -1,14 +1,9 @@
-import {
-    audienceNamespace,
-    speakerNamespace,
-    roomStates,
-    socketData,
-} from "./index";
-import {sendState, sendAudience} from "./util";
-import {makeRoom} from "./make-room";
+import {audienceNamespace, speakerNamespace, socketData} from "./index";
+import {makeRoom, sendState, sendAudience, roomStates} from "./room";
 
 
 export const connect = function (socket) {
+    // eslint-disable-next-line no-console
     console.log("A speaker connected");
 };
 
@@ -37,6 +32,7 @@ export const join = function (data, reject) {
     );
 
     const {committee} = roomStates[roomCode];
+    // eslint-disable-next-line no-console
     console.log(`A speaker joined ${committee} (${roomCode})`);
 };
 export const leave = function (data) {
@@ -60,13 +56,36 @@ export const leave = function (data) {
     );
 
     const {committee} = roomStates[roomCode];
+    // eslint-disable-next-line no-console
     console.log(`A speaker left ${committee} (${roomCode})`);
+};
+
+
+export const startSpeakersList = function () {
+    console.log("startSpeakersList");
+};
+export const endSpeakersList = function () {
+    console.log("endSpeakersList");
+};
+export const startMotions = function () {
+    console.log("startMotions");
+};
+export const endMotions = function () {
+    console.log("endMotions");
+};
+export const startVoting = function () {
+    console.log("startVoting");
+};
+export const endVoting = function () {
+    console.log("endVoting");
 };
 
 export const ask = function ({question}) {
     roomStates[roomCode].currentQuestion = question;
     roomStates[roomCode].results = {a: 0, b: 0, c: 0, d: 0};
     audienceNamespace.sockets.emit("ask", question);
+
+    // eslint-disable-next-line no-console
     console.log(`"${question.q}" asked in ${roomCode}`);
 };
 
@@ -101,6 +120,7 @@ export const createRoom = function (data, reject) {
         {committee},
     );
 
+    // eslint-disable-next-line no-console
     console.log(`Room created: ${committee} (${roomCode})`);
 
     // Join room if set
@@ -127,5 +147,6 @@ export const disconnecting = function (reason) {
         sendAudience(roomCode);
     }
 
+    // eslint-disable-next-line no-console
     console.log(`${socketData.get(this) ?.countryName || "An audience member"} disconnected (${reason})`);
 };

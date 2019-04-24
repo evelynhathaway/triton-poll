@@ -2,8 +2,10 @@ import express from "express";
 import SocketIO from "socket.io";
 import path from "path";
 
-import {makeRoom} from "./make-room";
+// Room helper functions
+import {makeRoom} from "./room";
 
+// Server-sider sockets code for each context
 import * as audience from "./audience";
 import * as speaker from "./speaker";
 
@@ -29,11 +31,9 @@ const server = app.listen(DEVELOPMENT ? 8080 : 80);
 // Create Socket.io server on express server instance
 export const io = SocketIO.listen(server);
 // Create namespaces for the audience and speakers
-export const audienceNamespace = io.of('/audience');
-export const speakerNamespace = io.of('/speaker');
+export const audienceNamespace = io.of("/audience");
+export const speakerNamespace = io.of("/speaker");
 
-// Create object for the state for each room
-export const roomStates = {};
 // Weakly store data about each connection
 export const socketData = new WeakMap();
 
@@ -43,17 +43,24 @@ export const socketData = new WeakMap();
 DEVELOPMENT && makeRoom(
     "TEST",
     {
-        committee: "DEBUG",
+        committee: "Committee of Debugging",
     },
 );
 
 
 // Event handler for audience member connections
 audienceNamespace.on("connect", function (socket) {
-    // Set handlers
+    // Room handlers
     socket.on("join", audience.join);
     socket.on("leave", audience.leave);
-    socket.on("answer", audience.answer);
+
+    // Interaction handlers
+    socket.on("raise placard", audience.raisePlacard);
+    socket.on("lower placard", audience.lowerPlacard);
+    socket.on("vote", audience.vote);
+    socket.on("request to speak", audience.requestToSpeak);
+
+    // Disconnection handler
     socket.once("disconnecting", audience.disconnecting);
 
     // Bubble up to audience submodule with `this` bound to `socket`
@@ -63,12 +70,21 @@ audienceNamespace.on("connect", function (socket) {
 
 // Event handler for speaker connections
 speakerNamespace.on("connect", function (socket) {
-    // Set handlers
-    socket.on("join", speaker.join);
-    socket.on("leave", speaker.leave);
+    // Room handlers
     socket.on("list rooms", speaker.listRooms);
     socket.on("create room", speaker.createRoom);
-    socket.on("ask", speaker.ask);
+    socket.on("join", speaker.join);
+    socket.on("leave", speaker.leave);
+
+    // Interaction handlers
+    socket.on("start speakers list", speaker.startSpeakersList);
+    socket.on("end speakers list", speaker.endSpeakersList);
+    socket.on("start motions", speaker.startMotions);
+    socket.on("end motions", speaker.endMotions);
+    socket.on("start voting", speaker.startVoting);
+    socket.on("end motions", speaker.endVoting);
+
+    // Disconnection handler
     socket.once("disconnecting", speaker.disconnecting);
 
     // Bubble up to speaker submodule with `this` bound to `socket`
@@ -76,4 +92,7 @@ speakerNamespace.on("connect", function (socket) {
 });
 
 
-console.log(`Server is running at ${DEVELOPMENT ? "localhost:8080" : "yourserver.com"}/`);
+// eslint-disable-next-line no-console
+// TODO: change back to localhost
+// TODO: use relative URL for development when I remove browsersync
+console.log(`Server is running at ${DEVELOPMENT ? "localhost:8080" : "poll.tritonmun.org"}/`);

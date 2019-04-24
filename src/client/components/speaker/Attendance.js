@@ -1,13 +1,16 @@
 import React from "react";
-import {SpeakerContext} from "../contexts/speaker-context";
+import {SpeakerContext} from "../../contexts";
+
 
 export default class Attendance extends React.Component {
     static contextType = SpeakerContext
 
-    addMemberRow(member, i) {
+    addMemberRow(member, index) {
         return (
-            <tr key={i}>
+            <tr key={index}>
                 <td>{member.countryName}</td>
+                <td>{member.status}</td>
+                <td>{member.vote}</td>
             </tr>
         );
     }
@@ -17,12 +20,16 @@ export default class Attendance extends React.Component {
 
         return (
             <div>
-                <h2>Attendance - {audience.length} member{audience.length === 1 ? "" : "s"}</h2>
+                <h2>Attendance</h2>
+                {/* TODO: how many connected/disconnected? */}
+                <p>There are {audience.length} member{audience.length === 1 ? " is" : "s are"} in this session.</p>
                 <div className="table-responsive">
                     <table className="table table-striped">
                         <thead>
                             <tr>
-                                <th>Countries connected</th>
+                                <th>Country name</th>
+                                <th>Status</th>
+                                <th>Vote</th>
                             </tr>
                         </thead>
                         <tbody>

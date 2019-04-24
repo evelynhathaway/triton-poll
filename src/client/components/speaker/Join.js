@@ -1,5 +1,5 @@
 import React from "react";
-import {SpeakerContext} from "../contexts/speaker-context";
+import {SpeakerContext} from "../../contexts";
 
 
 export default class JoinSpeaker extends React.Component {

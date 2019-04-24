@@ -1,12 +1,9 @@
-import {
-    audienceNamespace,
-    roomStates,
-    socketData,
-} from "./index";
-import {sendState, sendPickedState, sendAudience} from "./util";
+import {audienceNamespace, socketData} from "./index";
+import {sendState, sendPickedState, sendAudience, roomStates} from "./room";
 
 
 export const connect = function () {
+    // eslint-disable-next-line no-console
     console.log("An audience member connected");
 };
 
@@ -27,12 +24,13 @@ export const join = function (data, reject) {
     sendPickedState(
         this,
         roomCode,
-        ["committee", "currentQuestion"],
+        ["committee", "raiseReason"],
         {roomCode,countryName},
     );
     // Broadcast audience change to speakers in room
     sendAudience(roomCode);
 
+    // eslint-disable-next-line no-console
     console.log(`${countryName} joined room ${roomCode}`);
 };
 export const leave = function (data) {
@@ -57,11 +55,29 @@ export const leave = function (data) {
     // Broadcast audience change to speakers in room
     sendAudience(roomCode);
 
+
+    // eslint-disable-next-line no-console
     console.log(`${countryName || "An audience member"} left room ${roomCode}`);
+};
+
+
+export const raisePlacard = function () {
+    console.log("raisePlacard");
+};
+export const lowerPlacard = function () {
+    console.log("lowerPlacard");
+};
+export const vote = function () {
+    console.log("function");
+};
+export const requestToSpeak = function () {
+    console.log("requestToSpeak");
 };
 export const answer = function (data) {
     results[data.choice]++;
     audienceNamespace.sockets.emit("results", results);
+
+    // eslint-disable-next-line no-console
     console.log("Answer: \"%s\" - %j", data.choice, results);
 };
 
@@ -86,5 +102,7 @@ export const disconnecting = function (reason) {
         sendAudience(roomCode);
     }
 
+
+    // eslint-disable-next-line no-console
     console.log(`${countryName || "An audience member"} disconnected (${reason})`);
 };
