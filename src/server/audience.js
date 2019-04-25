@@ -1,4 +1,4 @@
-import {audienceNamespace, socketData} from "./index";
+import {audienceNamespace} from "./index";
 import {sendState, sendPickedState, sendAudience, roomStates} from "./room";
 
 
@@ -18,8 +18,8 @@ export const join = function (member, reject) {
     if (!countryName) return reject(`Could not join a room because no country name was entered.`);
     if (!(roomCode in roomStates)) return reject(`Could not join ${roomCode} as it doesn't exist or is no longer available.`);
 
-    // Set the data in the global WeakMap
-    socketData.set(this, member);
+    // Set the data in the audience Map
+    roomStates[roomCode].audience.set(this, member);
     // Join room with socket
     this.join(roomCode);
     // Send inital state
@@ -38,10 +38,10 @@ export const join = function (member, reject) {
 export const leave = function (member) {
     member.roomCode = member.roomCode.toUpperCase();
     const {roomCode} = member;
-    const {countryName} = socketData.get(this);
+    const {countryName} = roomStates[roomCode].audience.get(this);
 
-    // Reset the data in the global WeakMap
-    socketData.set(this, {});
+    // Delete audience member
+    roomStates[roomCode].audience.delete(this);
     // Leave room with socket
     this.leave(roomCode);
     // Send empty state
@@ -84,7 +84,6 @@ export const answer = function (data) {
 export const disconnecting = function (reason) {
     // Store rooms to update
     const rooms = Object.keys(this.rooms);
-    const countryName = socketData.get(this)?.countryName;
 
     // Finish disconnecting so it leaves its rooms
     this.disconnect();
@@ -95,11 +94,13 @@ export const disconnecting = function (reason) {
         if (/\/audience#/.test(roomCode)) {
             continue;
         }
+
+        // Delete audience member
+        roomStates[roomCode].audience.delete(this);
         // Broadcast audience change to speakers in room
         sendAudience(roomCode);
     }
 
-
     // eslint-disable-next-line no-console
-    console.log(`${countryName || "An audience member"} disconnected (${reason})`);
+    console.log(`An audience member disconnected (${reason})`);
 };

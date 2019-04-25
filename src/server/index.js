@@ -34,9 +34,6 @@ export const io = SocketIO.listen(server);
 export const audienceNamespace = io.of("/audience");
 export const speakerNamespace = io.of("/speaker");
 
-// Weakly store data about each connection
-export const socketData = new WeakMap();
-
 
 // Make a debugging room if in development mode
 // This helps with hot reloaded/synced browsers that autoconnect to a room
@@ -79,7 +76,6 @@ speakerNamespace.on("connect", function (socket) {
     socket.on("start voting", speaker.startVoting);
     socket.on("end voting", speaker.endVoting);
     socket.on("lower placard", speaker.lowerPlacard);
-    socket.on("clear placards", speaker.clearPlacards);
 
     // Disconnection handler
     socket.once("disconnecting", speaker.disconnecting);

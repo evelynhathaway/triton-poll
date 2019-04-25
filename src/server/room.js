@@ -1,8 +1,3 @@
-import {
-    audienceNamespace,
-    speakerNamespace,
-    socketData,
-} from "./index";
 import {pick} from "./util";
 
 
@@ -43,26 +38,14 @@ export const makeRoom = function (roomCode, initalState = {}) {
         committee: "",
         // Boolean for if the room is voting
         voting: false,
-        // Initalize the stored inactive voters / people with their placards raised, prevents
-        // garbadge collection of their data, `countryName`: `Socket` instance pairs
-        inactiveRaised: {},
+        // Initalize the stored audience members
+        audience: new Map(),
+        // Initalize the stored speakers
+        speakers: new Map(),
 
         // Spread in overrides
         ...initalState,
     };
-
-    // Make getters and setters for audience and speaker arrays
-    // - From the global `socketData` WeakMap
-    Object.defineProperties(roomStates[roomCode], {
-        audience: {
-            get: getAudience,
-            enumerable: true,
-        },
-        speakers: {
-            get: getSpeakers,
-            enumerable: true,
-        },
-    });
 
     // Return back capitalized/generated room code
     return roomCode;
@@ -90,22 +73,4 @@ export const sendPickedState = function (namespace, roomCode, properties, additi
             ...pick(roomStates[roomCode], ...properties),
         },
     );
-};
-
-export const getMembers = function (namespace, roomCode) {
-    const room = namespace.adapter.rooms[roomCode];
-    const sockets = room ? Object.keys(room.sockets) : [];
-    return sockets.map(socket => socketData.get(
-        namespace.sockets[socket],
-    ));
-};
-export const getAudience = function (roomCode) {
-    return getMembers(audienceNamespace, roomCode);
-};
-export const getSpeakers = function (roomCode) {
-    return getMembers(speakerNamespace, roomCode);
-};
-
-export const sendAudience = function (roomCode) {
-    sendState(speakerNamespace, roomCode, {audience: getAudience(roomCode)});
 };

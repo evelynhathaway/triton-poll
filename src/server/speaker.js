@@ -1,4 +1,5 @@
-import {audienceNamespace, speakerNamespace, socketData} from "./index";
+import {audienceNamespace, speakerNamespace} from "./index";
+import {lowerPlacard as lowerPlacardAudience} from "./audience";
 import {makeRoom, sendState, sendAudience, roomStates} from "./room";
 
 
@@ -19,8 +20,8 @@ export const join = function (member, reject) {
     if (!roomCode) return reject(`Could not join a room because no room code was entered.`);
     if (!(roomCode in roomStates)) return reject(`Could not join ${roomCode} as it doesn't exist or is no longer available.`);
 
-    // Set the data in the global WeakMap
-    socketData.set(this, member);
+    // Set the data in the speakers Map
+    roomStates[roomCode].speakers.set(this, member);
 
     // Join room with socket
     this.join(roomCode);
@@ -41,8 +42,8 @@ export const leave = function (member) {
     const {roomCode} = member;
     const {committee} = roomStates[roomCode];
 
-    // Reset the data in the global WeakMap
-    socketData.set(this, {});
+    // Delete speaker
+    roomStates[roomCode].speaker.delete(this);
     // Leave room with socket
     this.leave(roomCode);
     // Send empty state
@@ -68,11 +69,10 @@ export const endVoting = function () {
     console.log("endVoting");
 };
 
-export const lowerPlacard = function () {
-    console.log("lowerPlacard");
-};
-export const clearPlacards = function () {
-    console.log("clearPlacards");
+export const lowerPlacard = function (members) {
+    for (const member of members) {
+        lowerPlacardAudience.bind(member)
+    }
 };
 
 export const ask = function ({question}) {
@@ -133,13 +133,17 @@ export const disconnecting = function (reason) {
     // Iterate over rooms
     for (const roomCode of rooms) {
         // Skip the room made for the ID
-        if (/\/audience#/.test(roomCode)) {
+        if (/\/speaker#/.test(roomCode)) {
             continue;
         }
-        // Broadcast audience change to speakers in room
-        sendAudience(roomCode);
+
+        // Delete speaker
+        roomStates[roomCode].speakers.delete(this);
+        // Broadcast speaker change to speakers in room
+        // sendAudience(roomCode); // TODO speakers
+
     }
 
     // eslint-disable-next-line no-console
-    console.log(`${socketData.get(this) ?.countryName || "An audience member"} disconnected (${reason})`);
+    console.log(`A speaker disconnected (${reason})`);
 };

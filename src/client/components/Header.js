@@ -19,7 +19,7 @@ export default class Header extends React.Component {
                         {committee && (
                             <div className="header-small">{committee}
                                 {roomCode && (
-                                    <span class="room-code-small"> ({roomCode})</span>
+                                    <span className="room-code-small"> ({roomCode})</span>
                                 )}
                             </div>
                         )}

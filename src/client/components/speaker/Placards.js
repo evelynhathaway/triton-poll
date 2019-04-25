@@ -7,7 +7,7 @@ export default class Placards extends React.Component {
     static contextType = SpeakerContext
 
     clearAll() {
-        // TODO
+        // TODO lower every rendered card (as appossed to sending clearAll to the server)
     }
 
     render() {
