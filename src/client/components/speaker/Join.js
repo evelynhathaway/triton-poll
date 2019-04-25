@@ -41,7 +41,7 @@ export default class JoinSpeaker extends React.Component {
 
         return (
             <div>
-                <h2 className="mt-6">Join a room</h2>
+                <h2>Join a room</h2>
                 <div className="table-responsive">
                     <table className="table table-striped">
                         <thead>
@@ -65,9 +65,9 @@ export default class JoinSpeaker extends React.Component {
                     </table>
                 </div>
 
-                <hr className="mtb-6"></hr>
+                <hr className="my-3"></hr>
 
-                <h2 className="mt-6">Create a room</h2>
+                <h2>Create a room</h2>
                 <form action="javascript:void(0)" onSubmit={this.createRoom.bind(this)}>
                     <label htmlFor="committee-input">Committee</label>
                     <p>This will be shown to students as the page title.</p>

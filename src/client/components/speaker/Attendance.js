@@ -20,7 +20,7 @@ export default class Attendance extends React.Component {
 
         return (
             <div>
-                <h2>Attendance</h2>
+                <h2 className="my-3">Attendance</h2>
                 {/* TODO: how many connected/disconnected? */}
                 <p>There are {audience.length} member{audience.length === 1 ? " is" : "s are"} in this session.</p>
                 <div className="table-responsive">

@@ -15,7 +15,7 @@ export default class Placards extends React.Component {
 
         return (
             <div id="placards">
-                <h2>Placards</h2>
+                <h2 className="my-3">Placards</h2>
                 <button
                     className={"btn btn-primary" + (placards.length ? "" : "disabled")}
                     onClick={this.clearAll.bind(this)}
@@ -23,8 +23,10 @@ export default class Placards extends React.Component {
                 >
                     Clear all
                 </button>
-                {/* For each placard that is up */}
-                {placards.map((placard, index) => <Placard key={index} placard={placard}/>)}
+                <div className="placards mt-3">
+                    {/* For each placard that is up */}
+                    {placards.map((placard, index) => <Placard key={index} placard={placard}/>)}
+                </div>
             </div>
         );
     }

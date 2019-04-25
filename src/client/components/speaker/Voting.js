@@ -8,9 +8,6 @@ export default class Voting extends React.Component {
     state = {
         voting: false,
         votes: {
-            get total() {
-                return Object.keys(this).reduce((accumulator, key) => key !== "total" && accumulator + (this[key].amount || 0), 0);
-            },
             yes: 0,
             no: 0,
             abstain: 0,
@@ -28,12 +25,20 @@ export default class Voting extends React.Component {
         socket.emit("end voting");
     }
 
+    makePercent(amount, total, places = 2) {
+        const multiplier = 10**places;
+        const percent = Math.round(amount / total * 100 * multiplier) / multiplier;
+        return percent ? percent + "%" : "N/A";
+    }
+
     render() {
         const {voting, votes} = this.state;
+        const {yes, no, abstain} = votes;
+        const total = yes + no + abstain;
 
         return (
             <div id="voting">
-                <h2>Voting</h2>
+                <h2 className="my-3">Voting</h2>
 
                 <button
                     className={"btn btn-primary" + (voting ? "disabled": "")}
@@ -50,7 +55,7 @@ export default class Voting extends React.Component {
                     Clear and End
                 </button>
 
-                <div className="table-responsive">
+                <div className="table-responsive mt-3">
                     <table className="table">
                         <thead>
                             <tr>
@@ -62,16 +67,16 @@ export default class Voting extends React.Component {
                         </thead>
                         <tbody>
                             <tr>
-                                <td>{votes.yes}</td>
-                                <td>{votes.no}</td>
-                                <td>{votes.abstain}</td>
-                                <td>{votes.total}</td>
+                                <td>{yes}</td>
+                                <td>{no}</td>
+                                <td>{abstain}</td>
+                                <td>{total}</td>
                             </tr>
                             {/* TODO: percents */}
                             <tr>
-                                <td>{votes.yes}</td>
-                                <td>{votes.no}</td>
-                                <td>{votes.abstain}</td>
+                                <td>{this.makePercent(yes, total)}</td>
+                                <td>{this.makePercent(no, total)}</td>
+                                <td>{this.makePercent(abstain, total)}</td>
                                 <td>100%</td>
                             </tr>
                         </tbody>

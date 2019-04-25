@@ -9,8 +9,8 @@ form button {
 }
 
 form label {
-    font-size: 1.5rem;
-    margin: 1em 0 0;
+    font-size: 1.25rem;
+    margin-top: 0.25rem;
 }
 
 .table td,
