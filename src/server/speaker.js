@@ -56,7 +56,6 @@ export const leave = function (member) {
             member: {},
             committee: "",
             voting: false,
-            votes: {},
             audience: [],
             speakers: [],
         },
@@ -69,17 +68,25 @@ export const leave = function (member) {
 export const startVoting = function (data) {
     const {roomCode} = data;
     roomStates[roomCode].voting = true;
-    sendPickedState(speakerNamespace, roomCode, ["voting", "votes"]);
+    sendPickedState(speakerNamespace, roomCode, ["voting", "audience"]);
     sendPickedState(audienceNamespace, roomCode, ["voting"]);
     console.log("startVoting");
 };
 export const endVoting = function (data) {
     const {roomCode} = data;
     roomStates[roomCode].voting = false;
-    sendPickedState(speakerNamespace, roomCode, ["voting", "votes"]);
-    sendPickedState(audienceNamespace, roomCode, ["voting"]);
+
     // Clear votes
-    roomStates[roomCode].votes.clear();
+    for (const voterSocket of roomStates[roomCode].votes.keys()) {
+        const member = roomStates[roomCode].audience.get(voterSocket);
+        delete member.vote;
+        roomStates[roomCode].audience.get(voterSocket, member);
+        roomStates[roomCode].audience.delete(voterSocket);
+    }
+
+    sendPickedState(speakerNamespace, roomCode, ["voting", "audience"]);
+    sendPickedState(audienceNamespace, roomCode, ["voting"]);
+
     console.log("endVoting");
 };
 

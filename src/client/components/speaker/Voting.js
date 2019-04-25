@@ -5,15 +5,22 @@ import {AppContext} from "../../contexts";
 export default class Voting extends React.Component {
     static contextType = AppContext
 
+    constructor() {
+        super(...arguments);
+
+        this.startVoting = this.startVoting.bind(this);
+        this.endVoting = this.endVoting.bind(this);
+    }
+
     startVoting() {
         const {socket} = this.context;
-        const {member} = this.context;
+        const {member} = this.context.state;
 
         socket.emit("start voting", member);
     }
     endVoting() {
         const {socket} = this.context;
-        const {member} = this.context;
+        const {member} = this.context.state;
 
         socket.emit("end voting", member);
     }
@@ -24,10 +31,29 @@ export default class Voting extends React.Component {
         return percent ? percent + "%" : "N/A";
     }
 
+    makeResults() {
+        const {audience} = this.context.state;
+
+        return audience.reduce(
+            (results, member) => {
+                if (member.vote) {
+                    results[member.vote]++;
+                    results.total++;
+                }
+                return results;
+            },
+            {
+                yes: 0,
+                no: 0,
+                abstain: 0,
+                total: 0,
+            },
+        );
+    }
+
     render() {
-        const {voting, votes} = this.context.state;
-        const {yes, no, abstain} = votes;
-        const total = yes + no + abstain;
+        const {voting} = this.context.state;
+        const {yes, no, abstain, total} = this.makeResults();
 
         return (
             <div id="voting">
@@ -35,14 +61,14 @@ export default class Voting extends React.Component {
 
                 <button
                     className={"btn btn-primary" + (voting ? "disabled": "")}
-                    onClick={this.startVoting.bind(this)}
+                    onClick={this.startVoting}
                     disabled={voting ? "disabled" : ""}
                 >
                     Start
                 </button>
                 <button
                     className={"btn btn-primary" + (voting ? "" : "disabled")}
-                    onClick={this.endVoting.bind(this)}
+                    onClick={this.endVoting}
                     disabled={voting ? "" : "disabled"}
                 >
                     Clear and End
@@ -65,7 +91,6 @@ export default class Voting extends React.Component {
                                 <td>{abstain}</td>
                                 <td>{total}</td>
                             </tr>
-                            {/* TODO: percents */}
                             <tr>
                                 <td>{this.makePercent(yes, total)}</td>
                                 <td>{this.makePercent(no, total)}</td>
