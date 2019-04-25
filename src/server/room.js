@@ -33,9 +33,9 @@ export const makeRoomCode = function () {
 
 // Initalize a room in the `roomStates` object
 // - Room code and inital state are optional
-export const makeRoom = function (roomCode = makeRoomCode(), initalState = {}) {
+export const makeRoom = function (roomCode, initalState = {}) {
     // Get room code from either provided (uppercased) or make one
-    roomCode = roomCode.toUpperCase();
+    roomCode = roomCode.toUpperCase() || makeRoomCode();
 
     // Initalize state for new room
     roomStates[roomCode] = {

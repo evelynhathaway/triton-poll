@@ -17,7 +17,7 @@ export const join = function (member, reject) {
     // Rejections
     if (!member) return reject(`Could not join a room because no data was passed to the server.`);
     if (!roomCode) return reject(`Could not join a room because no room code was entered.`);
-    if (!(roomCode in roomStates)) return reject(`Could not join ${roomCode} as there's no session with that room code.`);
+    if (!(roomCode in roomStates)) return reject(`Could not join ${roomCode} as it doesn't exist or is no longer available.`);
 
     // Set the data in the global WeakMap
     socketData.set(this, member);
@@ -61,24 +61,18 @@ export const leave = function (member) {
     console.log(`A speaker left ${committee} (${roomCode})`);
 };
 
-
-export const startSpeakersList = function () {
-    console.log("startSpeakersList");
-};
-export const endSpeakersList = function () {
-    console.log("endSpeakersList");
-};
-export const startMotions = function () {
-    console.log("startMotions");
-};
-export const endMotions = function () {
-    console.log("endMotions");
-};
 export const startVoting = function () {
     console.log("startVoting");
 };
 export const endVoting = function () {
     console.log("endVoting");
+};
+
+export const lowerPlacard = function () {
+    console.log("lowerPlacard");
+};
+export const clearPlacards = function () {
+    console.log("clearPlacards");
 };
 
 export const ask = function ({question}) {
@@ -109,9 +103,7 @@ export const createRoom = function (data, reject) {
     let {roomCode} = data;
 
     // Send error to client if there the room isn't available
-    if (roomCode in roomStates) {
-        return reject(`The room code ${roomCode} is already in use.`);
-    }
+    if (roomCode in roomStates) return reject(`The room code ${roomCode} is already in use.`);
 
     // Make new room, store room code if changed
     roomCode = makeRoom(

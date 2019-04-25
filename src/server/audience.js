@@ -16,7 +16,7 @@ export const join = function (member, reject) {
     if (!member) return reject(`Could not join a room because no data was passed to the server.`);
     if (!roomCode) return reject(`Could not join a room because no room code was entered.`);
     if (!countryName) return reject(`Could not join a room because no country name was entered.`);
-    if (!(roomCode in roomStates)) return reject(`Could not join ${roomCode} as there's no session with that room code.`);
+    if (!(roomCode in roomStates)) return reject(`Could not join ${roomCode} as it doesn't exist or is no longer available.`);
 
     // Set the data in the global WeakMap
     socketData.set(this, member);
@@ -68,10 +68,7 @@ export const lowerPlacard = function () {
     console.log("lowerPlacard");
 };
 export const vote = function () {
-    console.log("function");
-};
-export const requestToSpeak = function () {
-    console.log("requestToSpeak");
+    console.log("vote");
 };
 export const answer = function (data) {
     results[data.choice]++;

@@ -58,7 +58,6 @@ audienceNamespace.on("connect", function (socket) {
     socket.on("raise placard", audience.raisePlacard);
     socket.on("lower placard", audience.lowerPlacard);
     socket.on("vote", audience.vote);
-    socket.on("request to speak", audience.requestToSpeak);
 
     // Disconnection handler
     socket.once("disconnecting", audience.disconnecting);
@@ -77,12 +76,10 @@ speakerNamespace.on("connect", function (socket) {
     socket.on("leave", speaker.leave);
 
     // Interaction handlers
-    socket.on("start speakers list", speaker.startSpeakersList);
-    socket.on("end speakers list", speaker.endSpeakersList);
-    socket.on("start motions", speaker.startMotions);
-    socket.on("end motions", speaker.endMotions);
     socket.on("start voting", speaker.startVoting);
-    socket.on("end motions", speaker.endVoting);
+    socket.on("end voting", speaker.endVoting);
+    socket.on("lower placard", speaker.lowerPlacard);
+    socket.on("clear placards", speaker.clearPlacards);
 
     // Disconnection handler
     socket.once("disconnecting", speaker.disconnecting);
