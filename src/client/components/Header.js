@@ -13,19 +13,20 @@ export default class Header extends React.Component {
             <header id="header">
                 {/* Conference name, committee */}
                 <div className="float-left">
-                    {/* TODO: proper size */}
-                    <img alt="Triton MUN logo" src="/img/MUN Logo Final.png"/>
-                    <div className="header-large">Triton MUN</div>
-                    {committee && <div className="header-small">{committee}</div>}
+                    <img alt="Triton MUN logo" src="/img/logo-small.png"/>
+                    <span className="d-inline-block align-middle">
+                        <div className="header-large">Triton MUN</div>
+                        {committee && <div className="header-small">{committee}</div>}
+                    </span>
                 </div>
 
                 {/* Room code */}
                 <div className="float-right header-right">
                     {roomCode && (
-                        <>
+                        <span className="d-inline-block align-middle">
                             <div className="header-large">{roomCode}</div>
                             <div className="header-small">Room Code</div>
-                        </>
+                        </span>
                     )}
                 </div>
             </header>
