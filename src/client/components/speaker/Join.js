@@ -16,6 +16,7 @@ export default class JoinSpeaker extends React.Component {
         this.listRooms();
     }
 
+    // TODO: refresh list
     listRooms() {
         const {socket} = this.context;
 

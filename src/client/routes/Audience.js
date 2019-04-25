@@ -10,6 +10,14 @@ import {AppContext, AudienceContext} from "../contexts";
 export default class Audience extends React.Component {
     static contextType = AppContext
 
+    state = {
+        voting: false,
+        placard: {
+            rasied: false,
+            timeRaised: null,
+        },
+    }
+
     componentDidMount() {
         const socketAddress = (process.env.NODE_ENV === "development" ? "http://localhost:8080" : "") + "/audience";
         // Create socket from `io`, assign to context
@@ -25,6 +33,7 @@ export default class Audience extends React.Component {
         this.context.socket = undefined;
     }
 
+    // TODO: better sharing of methods using imported functions/etc
     get join() {
         return this.context.join;
     }
@@ -42,8 +51,8 @@ export default class Audience extends React.Component {
                     status === "connected" && (
                         roomCode && countryName && (
                             <>
-                                <Placard/>
-                                <Voting/>
+                                <Placard member={this.context.state.member} placard={this.state.placard}/>
+                                <Voting voting={this.state.voting}/>
                             </>
                         ) || (
                             <Join/>

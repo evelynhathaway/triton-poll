@@ -13,6 +13,9 @@ export default class Placard extends React.Component {
     }
 
     render() {
+        const {countryName} = this.props.member;
+        const {rasied, timeRaised} = this.props.placard;
+
         return (
             <div className="card text-center" onClick={this.lowerPlacard.bind(this)}>
                 <div className="card-body">
@@ -21,7 +24,7 @@ export default class Placard extends React.Component {
                         rasied && (
                             <>
                                 <span>Rasied </span>
-                                <TimeAgo minPeriod={3} date={date} className="text-muted"/>
+                                <TimeAgo minPeriod={3} date={timeRaised} className="text-muted"/>
                             </>
                         ) || (
                             <span>Lowered, tap to raise</span>

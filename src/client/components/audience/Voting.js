@@ -14,7 +14,7 @@ export default class Voting extends React.Component {
     }
 
     render() {
-        const {voting} = this.context.state;
+        const {voting} = this.props;
 
         return (
             <div id="voting">

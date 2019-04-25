@@ -13,9 +13,9 @@ export const join = function (member, reject) {
     const {roomCode, countryName} = member;
 
     // Rejections
-    if (!member) return reject(`Could not join a room because no data was passed to the server.`);
-    if (!roomCode) return reject(`Could not join a room because no room code was entered.`);
-    if (!countryName) return reject(`Could not join a room because no country name was entered.`);
+    if (!member) return reject("Could not join a room because no data was passed to the server.");
+    if (!roomCode) return reject("Could not join a room because no room code was entered.");
+    if (!countryName) return reject("Could not join a room because no country name was entered.");
     if (!(roomCode in roomStates)) return reject(`Could not join ${roomCode} as it doesn't exist or is no longer available.`);
 
     // Set the data in the audience Map
@@ -29,6 +29,7 @@ export const join = function (member, reject) {
         ["committee"],
         {member},
     );
+
     // Broadcast audience change to speakers in room
     sendAudience(roomCode);
 

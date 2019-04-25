@@ -16,8 +16,8 @@ export const join = function (member, reject) {
     const {committee} = roomStates[roomCode];
 
     // Rejections
-    if (!member) return reject(`Could not join a room because no data was passed to the server.`);
-    if (!roomCode) return reject(`Could not join a room because no room code was entered.`);
+    if (!member) return reject("Could not join a room because no data was passed to the server.");
+    if (!roomCode) return reject("Could not join a room because no room code was entered.");
     if (!(roomCode in roomStates)) return reject(`Could not join ${roomCode} as it doesn't exist or is no longer available.`);
 
     // Set the data in the speakers Map
@@ -43,7 +43,7 @@ export const leave = function (member) {
     const {committee} = roomStates[roomCode];
 
     // Delete speaker
-    roomStates[roomCode].speaker.delete(this);
+    roomStates[roomCode].speakers.delete(this);
     // Leave room with socket
     this.leave(roomCode);
     // Send empty state
@@ -93,7 +93,7 @@ export const listRooms = function (resolve, reject) {
                 roomCode,
                 // Extract state to send
                 committee: roomStates[roomCode].committee,
-            }
+            };
         }),
     });
 };

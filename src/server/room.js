@@ -1,3 +1,4 @@
+import {speakerNamespace} from "./index";
 import {pick} from "./util";
 
 
@@ -73,4 +74,8 @@ export const sendPickedState = function (namespace, roomCode, properties, additi
             ...pick(roomStates[roomCode], ...properties),
         },
     );
+};
+
+export const sendAudience = function (roomCode) {
+    sendPickedState(speakerNamespace, roomCode, ["audience"]);
 };
