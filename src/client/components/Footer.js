@@ -6,8 +6,8 @@ export default class Footer extends React.Component {
     static contextType = AppContext
 
     render() {
-        const {leave} = this.props;
-        const {roomCode} = this.props.state;
+        const {leave} = this.context;
+        const {roomCode} = this.context.state.member;
 
         return (
             <footer id="header-text">
@@ -18,7 +18,7 @@ export default class Footer extends React.Component {
 
                 {/* Leave room */}
                 <div>
-                    {roomCode && leave && <button className="btn btn-outline-dark" onClick={leave}>Leave room</button>}
+                    {roomCode && <button className="btn btn-outline-dark" onClick={leave}>Leave room</button>}
                 </div>
             </footer>
         );

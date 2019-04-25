@@ -12,71 +12,34 @@ export default class Speaker extends React.Component {
     static contextType = AppContext
 
     state = {
-        status: "disconnected",
         audience: [],
-        roomCode: sessionStorage.roomCode,
-        votes: {
-            get total() {
-                return Object.keys(this).reduce((accumulator, key) => key !== "total" && accumulator + (this[key].amount || 0), 0);
-            },
-            yes: 0,
-            no: 0,
-            abstain: 0,
-        },
     }
 
     componentDidMount() {
-        const socketAddress = (process.env.NODE_ENV === "development" ? "http://192.168.86.2:8080" : "") + "/speaker";
+        const socketAddress = (process.env.NODE_ENV === "development" ? "http://localhost:8080" : "") + "/speaker";
         // Create socket from `io`, assign to context
-        this.socket = io(socketAddress);
+        this.socket = this.context.socket = io(socketAddress);
 
-        this.socket.on("connect", this.connect.bind(this));
-        this.socket.on("disconnect", this.disconnect.bind(this));
-        this.socket.on("update state", this.updateState.bind(this));
+        this.socket.on("connect", this.context.connect.bind(this.context));
+        this.socket.on("disconnect", this.context.disconnect.bind(this.context));
+        this.socket.on("update state", this.context.updateState.bind(this.context));
     }
 
     componentWillUnmount() {
         this.socket.disconnect();
+        this.context.socket = undefined;
     }
 
-    updateState(state) {
-        // Store room if set
-        if (typeof state.roomCode !== "undefined") {
-            sessionStorage.roomCode = state.roomCode;
-        }
-
-        // Forward to React
-        this.setState(state);
+    get join() {
+        return this.context.join;
     }
-
-    connect() {
-        const {roomCode} = this.state;
-
-        if (roomCode) {
-            this.join({roomCode});
-        }
-
-        this.setState({
-            status: "connected",
-        });
-    }
-    disconnect() {
-        this.setState({
-            status: "disconnected",
-        });
-    }
-
-    join({roomCode}) {
-        // Ask server to join as a speaker in `roomCode`
-        this.socket.emit("join", {roomCode}, error => alert(error));
-    }
-    leave() {
-        // Ask server to leave `roomCode`
-        this.socket.emit("leave", {roomCode: this.state.roomCode});
+    get leave() {
+        return this.context.leave;
     }
 
     render() {
-        const {status, roomCode} = this.state;
+        const {status, member} = this.context.state;
+        const {roomCode} = member;
 
         return (
             <SpeakerContext.Provider value={this}>

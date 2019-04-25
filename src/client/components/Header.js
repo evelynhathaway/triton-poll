@@ -6,20 +6,27 @@ export default class Header extends React.Component {
     static contextType = AppContext
 
     render() {
-        const {committee, roomCode} = this.props.state;
+        const {committee, member} = this.context.state;
+        const {roomCode} = member;
 
         return (
-            <header id="header-text">
+            <header id="header">
                 {/* Conference name, committee */}
                 <div className="float-left">
-                    <h1>Triton MUN</h1>
-                    {committee && <p>{committee}</p>}
+                    {/* TODO: proper size */}
+                    <img alt="Triton MUN logo" src="/img/MUN Logo Final.png"/>
+                    <div className="header-large">Triton MUN</div>
+                    {committee && <div className="header-small">{committee}</div>}
                 </div>
 
                 {/* Room code */}
-                <div className="float-right">
-                    {roomCode && <h1>{roomCode}</h1>}
-                    {roomCode && <p>Room Code</p>}
+                <div className="float-right header-right">
+                    {roomCode && (
+                        <>
+                            <div className="header-large">{roomCode}</div>
+                            <div className="header-small">Room Code</div>
+                        </>
+                    )}
                 </div>
             </header>
         );

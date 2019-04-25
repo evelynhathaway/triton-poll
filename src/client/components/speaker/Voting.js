@@ -5,6 +5,18 @@ import {SpeakerContext} from "../../contexts";
 export default class Voting extends React.Component {
     static contextType = SpeakerContext
 
+    state = {
+        voting: false,
+        votes: {
+            get total() {
+                return Object.keys(this).reduce((accumulator, key) => key !== "total" && accumulator + (this[key].amount || 0), 0);
+            },
+            yes: 0,
+            no: 0,
+            abstain: 0,
+        },
+    }
+
     startVoting() {
         const {socket} = this.context;
 
@@ -17,7 +29,7 @@ export default class Voting extends React.Component {
     }
 
     render() {
-        const {voting, votes} = this.context.state;
+        const {voting, votes} = this.state;
 
         return (
             <div id="voting">

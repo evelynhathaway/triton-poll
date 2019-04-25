@@ -10,7 +10,7 @@ export default class AlertBanner extends React.Component {
 
         return (
             status !== "connected" && (
-                <div class="alert alert-danger" role="alert">
+                <div className="alert alert-danger" role="alert">
                     <strong>Disconnected from server</strong>
                     <span>, please check your network connection</span>
                 </div>

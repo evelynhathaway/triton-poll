@@ -18,12 +18,21 @@ form label {
     vertical-align: middle;
 }
 
-#header-text {
+#header {
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
     justify-content: space-between;
     align-items: flex-start;
+}
+#header .header-large {
+    font-size: 2em;
+}
+#header .header-small {
+    color: #595959;
+}
+#header .header-right {
+    text-align: right;
 }
 .alert {
     margin-top: 1rem;

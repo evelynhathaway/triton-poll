@@ -8,24 +8,26 @@ export const connect = function () {
 };
 
 // When an audience member joins a room with a country name
-export const join = function (data, reject) {
-    const {countryName, roomCode} = data;
+export const join = function (member, reject) {
+    member.roomCode = member.roomCode.toUpperCase();
+    const {roomCode, countryName} = member;
 
-    // Send error to client if there the room is missing
-    if (!(roomCode in roomStates)) {
-        return reject(`Could not join ${roomCode} as there's no session with that room code.`);
-    }
+    // Rejections
+    if (!member) return reject(`Could not join a room because no data was passed to the server.`);
+    if (!roomCode) return reject(`Could not join a room because no room code was entered.`);
+    if (!countryName) return reject(`Could not join a room because no country name was entered.`);
+    if (!(roomCode in roomStates)) return reject(`Could not join ${roomCode} as there's no session with that room code.`);
 
     // Set the data in the global WeakMap
-    socketData.set(this, {countryName});
+    socketData.set(this, member);
     // Join room with socket
     this.join(roomCode);
     // Send inital state
     sendPickedState(
         this,
         roomCode,
-        ["committee", "raiseReason"],
-        {roomCode,countryName},
+        ["committee"],
+        {member},
     );
     // Broadcast audience change to speakers in room
     sendAudience(roomCode);
@@ -33,8 +35,9 @@ export const join = function (data, reject) {
     // eslint-disable-next-line no-console
     console.log(`${countryName} joined room ${roomCode}`);
 };
-export const leave = function (data) {
-    const {roomCode} = data;
+export const leave = function (member) {
+    member.roomCode = member.roomCode.toUpperCase();
+    const {roomCode} = member;
     const {countryName} = socketData.get(this);
 
     // Reset the data in the global WeakMap
@@ -46,15 +49,12 @@ export const leave = function (data) {
         this,
         undefined,
         {
-            roomCode: "",
-            countryName: "",
+            member: {},
             committee: "",
-            currentQuestion: false,
         },
     );
     // Broadcast audience change to speakers in room
     sendAudience(roomCode);
-
 
     // eslint-disable-next-line no-console
     console.log(`${countryName || "An audience member"} left room ${roomCode}`);

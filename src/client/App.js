@@ -12,14 +12,57 @@ import {AppContext} from "./contexts";
 
 
 export default class App extends React.Component {
+    // TODO: use socket context for moving around socket?
+
+    state = {
+        status: "disconnected",
+        member: sessionStorage.member ? JSON.parse(sessionStorage.member) : {},
+    }
+
+    updateState(state) {
+        // Store room, country name, etc. if set
+        if (typeof state.member !== "undefined") {
+            sessionStorage.member = JSON.stringify(state.member);
+        }
+
+        // Forward to React
+        this.setState(state);
+    }
+
+    connect() {
+        const {member} = this.state;
+
+        this.setState({
+            status: "connected",
+        });
+
+        if (member?.roomCode) {
+            this.join(member);
+        }
+    }
+    disconnect() {
+        this.setState({
+            status: "disconnected",
+        });
+    }
+
+    join(member) {
+        // Ask server to join using the member object
+        this.socket.emit("join", member, error => alert(error));
+    }
+    leave() {
+        // Ask server to leave using the member object
+        this.socket.emit("leave", this.state.member);
+    }
+
     render() {
         return (
             <AppContext.Provider value={this}>
                 {/* Header */}
-                {/* <Header/> */}
+                <Header/>
 
                 {/* Disconnection alert banner */}
-                {/* <AlertBanner/> */}
+                <AlertBanner/>
 
                 {/* Browser history client-side router */}
                 <Router>
@@ -34,7 +77,7 @@ export default class App extends React.Component {
                 </Router>
 
                 {/* Footer */}
-                {/* <Footer/> */}
+                <Footer/>
             </AppContext.Provider>
         );
     }

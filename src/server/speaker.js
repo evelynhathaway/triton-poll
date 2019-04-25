@@ -8,16 +8,19 @@ export const connect = function (socket) {
 };
 
 // When a speaker joins a room
-export const join = function (data, reject) {
-    const {roomCode} = data;
+export const join = function (member, reject) {
+    member.roomCode = member.roomCode.toUpperCase();
+    member.speaker = true;
+    const {roomCode} = member;
+    const {committee} = roomStates[roomCode];
 
-    // Send error to client if there the room is missing
-    if (!(roomCode in roomStates)) {
-        return reject(`Could not join ${roomCode} as there's no session with that room code.`);
-    }
+    // Rejections
+    if (!member) return reject(`Could not join a room because no data was passed to the server.`);
+    if (!roomCode) return reject(`Could not join a room because no room code was entered.`);
+    if (!(roomCode in roomStates)) return reject(`Could not join ${roomCode} as there's no session with that room code.`);
 
     // Set the data in the global WeakMap
-    socketData.set(this, {speaker: true});
+    socketData.set(this, member);
 
     // Join room with socket
     this.join(roomCode);
@@ -26,17 +29,17 @@ export const join = function (data, reject) {
         this,
         undefined,
         {
-            roomCode,
+            member,
             ...roomStates[roomCode],
         },
     );
 
-    const {committee} = roomStates[roomCode];
     // eslint-disable-next-line no-console
     console.log(`A speaker joined ${committee} (${roomCode})`);
 };
-export const leave = function (data) {
-    const {roomCode} = data;
+export const leave = function (member) {
+    const {roomCode} = member;
+    const {committee} = roomStates[roomCode];
 
     // Reset the data in the global WeakMap
     socketData.set(this, {});
@@ -47,15 +50,13 @@ export const leave = function (data) {
         this,
         undefined,
         {
-            roomCode: "",
+            member: {},
             committee: "",
-            currentQuestion: false,
             audience: [],
             speakers: [],
         },
     );
 
-    const {committee} = roomStates[roomCode];
     // eslint-disable-next-line no-console
     console.log(`A speaker left ${committee} (${roomCode})`);
 };
