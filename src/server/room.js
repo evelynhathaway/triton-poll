@@ -39,6 +39,8 @@ export const makeRoom = function (roomCode, initalState = {}) {
         committee: "",
         // Boolean for if the room is voting
         voting: false,
+        // Stored votes that only clear after voting stops
+        votes: new Map(),
         // Initalize the stored audience members
         audience: new Map(),
         // Initalize the stored speakers
@@ -76,6 +78,17 @@ export const sendPickedState = function (namespace, roomCode, properties, additi
     );
 };
 
+export const getMembers = function (type, roomCode) {
+    return [...roomStates[roomCode][type].values()];
+};
+export const getAudience = function (roomCode) {
+    return getMembers("audience", roomCode);
+};
+export const getSpeakers = function (roomCode) {
+    return getMembers("speakers", roomCode);
+};
 export const sendAudience = function (roomCode) {
-    sendPickedState(speakerNamespace, roomCode, ["audience"]);
+    sendState(speakerNamespace, roomCode, {
+        audience: getAudience(roomCode),
+    });
 };

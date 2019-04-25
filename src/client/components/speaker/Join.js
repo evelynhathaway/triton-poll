@@ -1,9 +1,9 @@
 import React from "react";
-import {SpeakerContext} from "../../contexts";
+import {AppContext} from "../../contexts";
 
 
 export default class JoinSpeaker extends React.Component {
-    static contextType = SpeakerContext
+    static contextType = AppContext
 
     state = {
         rooms: [],

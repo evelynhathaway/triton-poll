@@ -1,10 +1,10 @@
 import React from "react";
-import {SpeakerContext} from "../../contexts";
+import {AppContext} from "../../contexts";
 import Placard from "./Placard";
 
 
 export default class Placards extends React.Component {
-    static contextType = SpeakerContext
+    static contextType = AppContext
 
     clearAll() {
         // TODO lower every rendered card (as appossed to sending clearAll to the server)

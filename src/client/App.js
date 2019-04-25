@@ -1,6 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import {BrowserRouter as Router, Switch, Route} from "react-router-dom";
+import io from "socket.io-client";
 
 import Header from "./components/Header";
 import AlertBanner from "./components/AlertBanner";
@@ -11,10 +12,33 @@ import Whoops404 from "./routes/Whoops404";
 import {AppContext} from "./contexts";
 
 
+// TODO: use socket context for moving around socket?
 export default class App extends React.Component {
-    // TODO: use socket context for moving around socket?
+    constructor() {
+        super(...arguments);
+
+        this.updateState = this.updateState.bind(this);
+        this.connect = this.connect.bind(this);
+        this.disconnect = this.disconnect.bind(this);
+        this.connected = this.connected.bind(this);
+        this.disconnected = this.disconnected.bind(this);
+        this.join = this.join.bind(this);
+        this.leave = this.leave.bind(this);
+    }
 
     state = {
+        audience: [],
+        speakers: [],
+        placard: {
+            rasied: false,
+            timeRaised: null,
+        },
+        voting: false,
+        votes: {
+            yes: 0,
+            no: 0,
+            abstain: 0,
+        },
         status: "disconnected",
         member: sessionStorage.member ? JSON.parse(sessionStorage.member) : {},
     }
@@ -29,7 +53,24 @@ export default class App extends React.Component {
         this.setState(state);
     }
 
-    connect() {
+    connect(namespace) {
+        const socketAddress = (process.env.NODE_ENV === "development" ? "http://localhost:8080" : "");
+        const socketPath = `${socketAddress}/${namespace}`;
+
+        // Create socket from `io`
+        this.socket = io(socketPath);
+
+        // Handlers
+        this.socket.on("connect", this.connected.bind(this));
+        this.socket.on("disconnect", this.disconnected.bind(this));
+        this.socket.on("update state", this.updateState.bind(this));
+    }
+    disconnect() {
+        this.socket.disconnect();
+        this.socket = undefined;
+    }
+
+    connected() {
         const {member} = this.state;
 
         this.setState({
@@ -40,7 +81,7 @@ export default class App extends React.Component {
             this.join(member);
         }
     }
-    disconnect() {
+    disconnected() {
         this.setState({
             status: "disconnected",
         });

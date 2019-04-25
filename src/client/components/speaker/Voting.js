@@ -1,28 +1,21 @@
 import React from "react";
-import {SpeakerContext} from "../../contexts";
+import {AppContext} from "../../contexts";
 
 
 export default class Voting extends React.Component {
-    static contextType = SpeakerContext
-
-    state = {
-        voting: false,
-        votes: {
-            yes: 0,
-            no: 0,
-            abstain: 0,
-        },
-    }
+    static contextType = AppContext
 
     startVoting() {
         const {socket} = this.context;
+        const {member} = this.context;
 
-        socket.emit("start voting");
+        socket.emit("start voting", member);
     }
     endVoting() {
         const {socket} = this.context;
+        const {member} = this.context;
 
-        socket.emit("end voting");
+        socket.emit("end voting", member);
     }
 
     makePercent(amount, total, places = 2) {
@@ -32,7 +25,7 @@ export default class Voting extends React.Component {
     }
 
     render() {
-        const {voting, votes} = this.state;
+        const {voting, votes} = this.context.state;
         const {yes, no, abstain} = votes;
         const total = yes + no + abstain;
 

@@ -1,9 +1,9 @@
 import React from "react";
-import {AudienceContext} from "../../contexts";
+import {AppContext} from "../../contexts";
 
 
 export default class Join extends React.Component {
-    static contextType = AudienceContext
+    static contextType = AppContext
 
     countryNameRef = React.createRef()
     roomCodeRef = React.createRef()

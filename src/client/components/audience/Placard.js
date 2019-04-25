@@ -1,9 +1,9 @@
 import React from "react";
-import {AudienceContext} from "../../contexts";
+import {AppContext} from "../../contexts";
 
 
 export default class Placard extends React.Component {
-    static contextType = AudienceContext
+    static contextType = AppContext
 
     raisePlacard() {
 

@@ -1,9 +1,9 @@
 import React from "react";
-import {SpeakerContext} from "../../contexts";
+import {AppContext} from "../../contexts";
 
 
 export default class Attendance extends React.Component {
-    static contextType = SpeakerContext
+    static contextType = AppContext
 
     addMemberRow(member, index) {
         return (

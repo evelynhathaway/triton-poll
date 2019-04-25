@@ -1,6 +1,6 @@
 import {audienceNamespace, speakerNamespace} from "./index";
 import {lowerPlacard as lowerPlacardAudience} from "./audience";
-import {makeRoom, sendState, sendAudience, roomStates} from "./room";
+import {makeRoom, sendState, sendPickedState, roomStates, getAudience, getSpeakers} from "./room";
 
 
 export const connect = function (socket) {
@@ -26,12 +26,14 @@ export const join = function (member, reject) {
     // Join room with socket
     this.join(roomCode);
     // Send inital state
-    sendState(
+    sendPickedState(
         this,
-        undefined,
+        roomCode,
+        ["committee", "voting", "votes"],
         {
             member,
-            ...roomStates[roomCode],
+            audience: getAudience(roomCode),
+            speakers: getSpeakers(roomCode),
         },
     );
 
@@ -53,6 +55,8 @@ export const leave = function (member) {
         {
             member: {},
             committee: "",
+            voting: false,
+            votes: {},
             audience: [],
             speakers: [],
         },
@@ -62,10 +66,20 @@ export const leave = function (member) {
     console.log(`A speaker left ${committee} (${roomCode})`);
 };
 
-export const startVoting = function () {
+export const startVoting = function (data) {
+    const {roomCode} = data;
+    roomStates[roomCode].voting = true;
+    sendPickedState(speakerNamespace, roomCode, ["voting", "votes"]);
+    sendPickedState(audienceNamespace, roomCode, ["voting"]);
     console.log("startVoting");
 };
-export const endVoting = function () {
+export const endVoting = function (data) {
+    const {roomCode} = data;
+    roomStates[roomCode].voting = false;
+    sendPickedState(speakerNamespace, roomCode, ["voting", "votes"]);
+    sendPickedState(audienceNamespace, roomCode, ["voting"]);
+    // Clear votes
+    roomStates[roomCode].votes.clear();
     console.log("endVoting");
 };
 

@@ -38,8 +38,7 @@ export const join = function (member, reject) {
 };
 export const leave = function (member) {
     member.roomCode = member.roomCode.toUpperCase();
-    const {roomCode} = member;
-    const {countryName} = roomStates[roomCode].audience.get(this);
+    const {roomCode, countryName} = member;
 
     // Delete audience member
     roomStates[roomCode].audience.delete(this);

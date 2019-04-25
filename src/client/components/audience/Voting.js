@@ -1,9 +1,9 @@
 import React from "react";
-import {AudienceContext} from "../../contexts";
+import {AppContext} from "../../contexts";
 
 
 export default class Voting extends React.Component {
-    static contextType = AudienceContext
+    static contextType = AppContext
 
     startVoting() {
     }
@@ -14,7 +14,7 @@ export default class Voting extends React.Component {
     }
 
     render() {
-        const {voting} = this.props;
+        const {voting} = this.context.state;
 
         return (
             <div id="voting">
