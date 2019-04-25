@@ -23,7 +23,7 @@ export default class Placards extends React.Component {
                 >
                     Clear all
                 </button>
-                <div className="placards mt-3">
+                <div className="placards my-3">
                     {/* For each placard that is up */}
                     {placards.map((placard, index) => <Placard key={index} placard={placard}/>)}
                 </div>

@@ -22,10 +22,12 @@ form label {
     margin: 0.5rem 0;
     display: flex;
     flex-direction: row;
-    flex-wrap: nowrap;
     justify-content: space-between;
     align-items: center;
     min-height: 4.5rem;
+    white-space: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
 }
 #header .header-large {
     font-size: 2rem;
@@ -36,10 +38,21 @@ form label {
 #header .header-right {
     text-align: right;
 }
+#header .room-code-small {
+    display: none;
+}
 #header img {
     height: 3rem;
     margin-right: 1.25rem;
 }
 .alert {
     margin-top: 1rem;
+}
+@media screen and (max-width: 575.98px) {
+    #header .header-right {
+        display: none;
+    }
+    #header .room-code-small {
+        display: inline;
+    }
 }

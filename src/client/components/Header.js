@@ -16,7 +16,13 @@ export default class Header extends React.Component {
                     <img alt="Triton MUN logo" src="/img/logo-small.png"/>
                     <span className="d-inline-block align-middle">
                         <div className="header-large">Triton MUN</div>
-                        {committee && <div className="header-small">{committee}</div>}
+                        {committee && (
+                            <div className="header-small">{committee}
+                                {roomCode && (
+                                    <span class="room-code-small"> ({roomCode})</span>
+                                )}
+                            </div>
+                        )}
                     </span>
                 </div>
 

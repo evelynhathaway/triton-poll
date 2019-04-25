@@ -6,8 +6,8 @@ export default class Footer extends React.Component {
     static contextType = AppContext
 
     render() {
-        const {leave} = this.context;
         const {roomCode} = this.context.state.member;
+        const leave = this.context.leave.bind(this.context);
 
         return (
             <footer id="header-text">
