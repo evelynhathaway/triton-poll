@@ -27,27 +27,29 @@ export const makeRoomCode = function () {
     return roomCode;
 };
 
-// Initalize a room in the `roomStates` object
-// - Room code and inital state are optional
-export const makeRoom = function (roomCode, initalState = {}) {
+// Initialize a room in the `roomStates` object
+// - Room code and initial state are optional
+export const makeRoom = function (roomCode, initialState = {}) {
     // Get room code from either provided (uppercased) or make one
     roomCode = roomCode.toUpperCase() || makeRoomCode();
 
-    // Initalize state for new room
+    // Initialize state for new room
     roomStates[roomCode] = {
         // Default committee
         committee: "",
         // Boolean for if the room is voting
         voting: false,
-        // Stored votes that only clear after voting stops
-        votes: new Map(),
-        // Initalize the stored audience members
+        // Stored voters that only clear after voting stops
+        voters: new Set(),
+        // Stored memebers with rasied placards that only clear after lowering
+        raisers: new Set(),
+        // Initialize the stored audience members
         audience: new Map(),
-        // Initalize the stored speakers
+        // Initialize the stored speakers
         speakers: new Map(),
 
         // Spread in overrides
-        ...initalState,
+        ...initialState,
     };
 
     // Return back capitalized/generated room code

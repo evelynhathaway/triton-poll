@@ -16,6 +16,7 @@ export default class Placards extends React.Component {
         return (
             <div id="placards">
                 <h2 className="my-3">Placards</h2>
+                <p>Rasied placards, click one to lower or clear all.</p>
                 <button
                     className={"btn btn-primary" + (placards.length ? "" : "disabled")}
                     onClick={this.clearAll.bind(this)}

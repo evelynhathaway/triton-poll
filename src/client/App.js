@@ -34,16 +34,12 @@ export default class App extends React.Component {
             timeRaised: null,
         },
         voting: false,
-        votes: {
-            yes: 0,
-            no: 0,
-            abstain: 0,
-        },
         status: "disconnected",
         member: sessionStorage.member ? JSON.parse(sessionStorage.member) : {},
     }
 
     updateState(state) {
+        console.log(state)
         // Store room, country name, etc. if set
         if (typeof state.member !== "undefined") {
             sessionStorage.member = JSON.stringify(state.member);

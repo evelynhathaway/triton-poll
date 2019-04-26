@@ -22,11 +22,11 @@ export const join = function (member, reject) {
     roomStates[roomCode].audience.set(this, member);
     // Join room with socket
     this.join(roomCode);
-    // Send inital state
+    // Send initial state
     sendPickedState(
         this,
         roomCode,
-        ["committee"],
+        ["committee", "voting"],
         {member},
     );
 
@@ -67,15 +67,23 @@ export const raisePlacard = function () {
 export const lowerPlacard = function () {
     console.log("lowerPlacard");
 };
-export const vote = function () {
-    console.log("vote");
-};
-export const answer = function (data) {
-    results[data.choice]++;
-    audienceNamespace.sockets.emit("results", results);
+export const vote = function (clientMember, vote) {
+    const {roomCode, countryName} = clientMember;
+    const member = roomStates[roomCode].audience.get(this);
+
+    if (!roomStates[roomCode].voting) {
+        return; // TODO: reject
+    }
+
+    member.vote = vote;
+    roomStates[roomCode].audience.set(this, member);
+    roomStates[roomCode].voters.add(this);
+
+    sendState(this, roomCode, {member});
+    sendAudience(roomCode);
 
     // eslint-disable-next-line no-console
-    console.log("Answer: \"%s\" - %j", data.choice, results);
+    console.log(`${countryName} voted ${vote}`);
 };
 
 
@@ -94,6 +102,8 @@ export const disconnecting = function (reason) {
         if (/\/audience#/.test(roomCode)) {
             continue;
         }
+
+        // TODO: set the status to disconnected and don't delete if they've voted or raised their placard. Then clean the audience out after voting stops or delete the specific member if their placard get's lowered by either the speaker. Allow the state of the disconnected user to be used when re-joining (just use the country name as a unique identifier for now)
 
         // Delete audience member
         roomStates[roomCode].audience.delete(this);

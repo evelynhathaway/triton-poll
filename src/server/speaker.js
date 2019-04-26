@@ -1,6 +1,6 @@
 import {audienceNamespace, speakerNamespace} from "./index";
 import {lowerPlacard as lowerPlacardAudience} from "./audience";
-import {makeRoom, sendState, sendPickedState, roomStates, getAudience, getSpeakers} from "./room";
+import {makeRoom, sendState, sendPickedState, roomStates, getAudience, getSpeakers, sendAudience} from "./room";
 
 
 export const connect = function (socket) {
@@ -25,11 +25,11 @@ export const join = function (member, reject) {
 
     // Join room with socket
     this.join(roomCode);
-    // Send inital state
+    // Send initial state
     sendPickedState(
         this,
         roomCode,
-        ["committee", "voting", "votes"],
+        ["committee", "voting"],
         {
             member,
             audience: getAudience(roomCode),
@@ -65,44 +65,41 @@ export const leave = function (member) {
     console.log(`A speaker left ${committee} (${roomCode})`);
 };
 
-export const startVoting = function (data) {
-    const {roomCode} = data;
+export const startVoting = function (member) {
+    const {roomCode} = member;
     roomStates[roomCode].voting = true;
-    sendPickedState(speakerNamespace, roomCode, ["voting", "audience"]);
+    sendPickedState(speakerNamespace, roomCode, ["voting"]);
     sendPickedState(audienceNamespace, roomCode, ["voting"]);
-    console.log("startVoting");
+
+    // eslint-disable-next-line no-console
+    console.log(`Voting has started in ${roomCode}`);
 };
-export const endVoting = function (data) {
-    const {roomCode} = data;
+export const endVoting = function (member) {
+    const {roomCode} = member;
     roomStates[roomCode].voting = false;
 
     // Clear votes
-    for (const voterSocket of roomStates[roomCode].votes.keys()) {
+    for (const voterSocket of roomStates[roomCode].voters.keys()) {
         const member = roomStates[roomCode].audience.get(voterSocket);
         delete member.vote;
-        roomStates[roomCode].audience.get(voterSocket, member);
-        roomStates[roomCode].audience.delete(voterSocket);
+        roomStates[roomCode].audience.set(voterSocket, member);
+        roomStates[roomCode].voters.delete(voterSocket);
+        console.log(member)
+        sendState(voterSocket, roomCode, {member}); // TODO: make sure this doesn't error if the socket has closed
     }
 
-    sendPickedState(speakerNamespace, roomCode, ["voting", "audience"]);
+    sendAudience(roomCode);
+    sendPickedState(speakerNamespace, roomCode, ["voting"]);
     sendPickedState(audienceNamespace, roomCode, ["voting"]);
 
-    console.log("endVoting");
+    // eslint-disable-next-line no-console
+    console.log(`Voting has ended in ${roomCode}`);
 };
 
 export const lowerPlacard = function (members) {
     for (const member of members) {
         lowerPlacardAudience.bind(member)
     }
-};
-
-export const ask = function ({question}) {
-    roomStates[roomCode].currentQuestion = question;
-    roomStates[roomCode].results = {a: 0, b: 0, c: 0, d: 0};
-    audienceNamespace.sockets.emit("ask", question);
-
-    // eslint-disable-next-line no-console
-    console.log(`"${question.q}" asked in ${roomCode}`);
 };
 
 export const listRooms = function (resolve, reject) {

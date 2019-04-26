@@ -28,7 +28,7 @@ export default class Voting extends React.Component {
     makePercent(amount, total, places = 2) {
         const multiplier = 10**places;
         const percent = Math.round(amount / total * 100 * multiplier) / multiplier;
-        return percent ? percent + "%" : "N/A";
+        return total ? percent + "%" : "N/A";
     }
 
     makeResults() {
@@ -60,18 +60,10 @@ export default class Voting extends React.Component {
                 <h2 className="my-3">Voting</h2>
 
                 <button
-                    className={"btn btn-primary" + (voting ? "disabled": "")}
-                    onClick={this.startVoting}
-                    disabled={voting ? "disabled" : ""}
+                    className={"btn btn-primary"}
+                    onClick={voting ? this.endVoting : this.startVoting}
                 >
-                    Start
-                </button>
-                <button
-                    className={"btn btn-primary" + (voting ? "" : "disabled")}
-                    onClick={this.endVoting}
-                    disabled={voting ? "" : "disabled"}
-                >
-                    Clear and End
+                    {voting ? "Clear and End" : "Start"}
                 </button>
 
                 <div className="table-responsive mt-3">
