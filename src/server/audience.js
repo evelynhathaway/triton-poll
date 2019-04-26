@@ -8,15 +8,20 @@ export const connect = function () {
 };
 
 // When an audience member joins a room with a country name
-export const join = function (member, reject) {
-    member.roomCode = member.roomCode.toUpperCase();
-    const {roomCode, countryName} = member;
+export const join = function (clientMember, reject) {
+    const {roomCode, countryName} = clientMember;
 
     // Rejections
-    if (!member) return reject("Could not join a room because no data was passed to the server.");
+    if (!clientMember) return reject("Could not join a room because no data was passed to the server.");
     if (!roomCode) return reject("Could not join a room because no room code was entered.");
     if (!countryName) return reject("Could not join a room because no country name was entered.");
     if (!(roomCode in roomStates)) return reject(`Could not join ${roomCode} as it doesn't exist or is no longer available.`);
+
+    // Re-make member object as to not inject state, normalize
+    const member = {
+        roomCode: clientMember.roomCode.toUpperCase(),
+        countryName,
+    };
 
     // Set the data in the audience Map
     roomStates[roomCode].audience.set(this, member);

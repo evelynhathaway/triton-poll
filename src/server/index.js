@@ -37,12 +37,14 @@ export const speakerNamespace = io.of("/speaker");
 
 // Make a debugging room if in development mode
 // This helps with hot reloaded/synced browsers that autoconnect to a room
-DEVELOPMENT && makeRoom(
-    "TEST",
-    {
-        committee: "Committee of Debugging",
-    },
-);
+if (DEVELOPMENT) {
+    makeRoom(
+        "TEST",
+        {
+            committee: "Committee of Debugging",
+        },
+    );
+}
 
 
 // Event handler for audience member connections
