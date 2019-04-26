@@ -98,7 +98,7 @@ export const endVoting = function (member) {
 
 export const lowerPlacard = function (members) {
     for (const member of members) {
-        lowerPlacardAudience.bind(member)
+        lowerPlacardAudience.call(member);
     }
 };
 

@@ -66,11 +66,36 @@ export const leave = function (member) {
 };
 
 
-export const raisePlacard = function () {
-    console.log("raisePlacard");
+export const raisePlacard = function (clientMember) {
+    const {roomCode, countryName} = clientMember;
+    const member = roomStates[roomCode].audience.get(this);
+
+    member.placard = {
+        raised: true,
+        timeRaised: Date.now(),
+    };
+    roomStates[roomCode].audience.set(this, member);
+    roomStates[roomCode].raisers.add(this);
+
+    sendState(this, roomCode, {member});
+    sendAudience(roomCode);
+
+    // eslint-disable-next-line no-console
+    console.log(`${countryName} raised their placard ${vote}`);
 };
-export const lowerPlacard = function () {
-    console.log("lowerPlacard");
+export const lowerPlacard = function (clientMember) {
+    const {roomCode, countryName} = clientMember;
+    const member = roomStates[roomCode].audience.get(this);
+
+    member.vote = vote;
+    roomStates[roomCode].audience.set(this, member);
+    roomStates[roomCode].voters.add(this);
+
+    sendState(this, roomCode, {member});
+    sendAudience(roomCode);
+
+    // eslint-disable-next-line no-console
+    console.log(`${countryName} lowered their placard ${vote}`);
 };
 export const vote = function (clientMember, vote) {
     const {roomCode, countryName} = clientMember;
