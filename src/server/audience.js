@@ -21,6 +21,9 @@ export const join = function (clientMember, reject) {
     const member = {
         roomCode: clientMember.roomCode.toUpperCase(),
         countryName,
+        placard: {
+            raised: false,
+        },
     };
 
     // Set the data in the audience Map
@@ -74,30 +77,31 @@ export const raisePlacard = function (clientMember) {
         raised: true,
         timeRaised: Date.now(),
     };
-    roomStates[roomCode].audience.set(this, member);
+
     roomStates[roomCode].raisers.add(this);
 
     sendState(this, roomCode, {member});
     sendAudience(roomCode);
 
     // eslint-disable-next-line no-console
-    console.log(`${countryName} raised their placard ${vote}`);
+    console.log(`${countryName} raised their placard`);
 };
 export const lowerPlacard = function (clientMember) {
     const {roomCode, countryName} = clientMember;
     const member = roomStates[roomCode].audience.get(this);
 
-    member.vote = vote;
-    roomStates[roomCode].audience.set(this, member);
-    roomStates[roomCode].voters.add(this);
+    member.placard = {
+        raised: false,
+    };
+    roomStates[roomCode].raisers.delete(this);
 
     sendState(this, roomCode, {member});
     sendAudience(roomCode);
 
     // eslint-disable-next-line no-console
-    console.log(`${countryName} lowered their placard ${vote}`);
+    console.log(`${countryName} lowered their placard`);
 };
-export const vote = function (clientMember, vote) {
+export const vote = function (clientMember, position) {
     const {roomCode, countryName} = clientMember;
     const member = roomStates[roomCode].audience.get(this);
 
@@ -105,15 +109,14 @@ export const vote = function (clientMember, vote) {
         return; // TODO: reject
     }
 
-    member.vote = vote;
-    roomStates[roomCode].audience.set(this, member);
+    member.vote = position;
     roomStates[roomCode].voters.add(this);
 
     sendState(this, roomCode, {member});
     sendAudience(roomCode);
 
     // eslint-disable-next-line no-console
-    console.log(`${countryName} voted ${vote}`);
+    console.log(`${countryName} voted ${position}`);
 };
 
 

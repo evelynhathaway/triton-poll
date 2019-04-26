@@ -26,8 +26,8 @@ export default class Audience extends React.Component {
                     status === "connected" && (
                         roomCode && countryName && (
                             <>
-                                <Placard member={this.context.state.member} placard={this.context.state.placard}/>
-                                <Voting voting={this.context.state.voting}/>
+                                <Placard/>
+                                <Voting/>
                             </>
                         ) || (
                             <Join/>

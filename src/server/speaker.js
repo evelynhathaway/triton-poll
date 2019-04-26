@@ -81,9 +81,7 @@ export const endVoting = function (member) {
     // Clear votes
     for (const voterSocket of roomStates[roomCode].voters.keys()) {
         const member = roomStates[roomCode].audience.get(voterSocket);
-        console.log(member, roomStates[roomCode].audience.keys(), roomStates[roomCode].voters.keys())
         delete member.vote;
-        roomStates[roomCode].audience.set(voterSocket, member);
         roomStates[roomCode].voters.delete(voterSocket);
         sendState(voterSocket, roomCode, {member}); // TODO: make sure this doesn't error if the socket has closed
     }
@@ -98,7 +96,9 @@ export const endVoting = function (member) {
 
 export const lowerPlacard = function (members) {
     for (const member of members) {
-        lowerPlacardAudience.call(member);
+        // TODO: send and use UUID to uniquely id the memebers
+        // const memberSocket = roomStates[roomCode].audience.get()
+        // lowerPlacardAudience.call(member);
     }
 };
 

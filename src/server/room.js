@@ -41,7 +41,7 @@ export const makeRoom = function (roomCode, initialState = {}) {
         voting: false,
         // Stored voters that only clear after voting stops
         voters: new Set(),
-        // Stored memebers with rasied placards that only clear after lowering
+        // Stored memebers with raised placards that only clear after lowering
         raisers: new Set(),
         // Initialize the stored audience members
         audience: new Map(),

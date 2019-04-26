@@ -29,17 +29,18 @@ export default class App extends React.Component {
     state = {
         audience: [],
         speakers: [],
-        placard: {
-            rasied: false,
-            timeRaised: null,
-        },
         voting: false,
         status: "disconnected",
-        member: sessionStorage.member ? JSON.parse(sessionStorage.member) : {},
+        member: sessionStorage.member ?
+            JSON.parse(sessionStorage.member) :
+            {
+                placard: {
+                    raised: false,
+                },
+            },
     }
 
     updateState(state) {
-        console.log(state)
         // Store room, country name, etc. if set
         if (typeof state.member !== "undefined") {
             sessionStorage.member = JSON.stringify(state.member);
