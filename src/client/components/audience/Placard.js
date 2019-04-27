@@ -29,7 +29,7 @@ export default class Placard extends React.Component {
     render() {
         const {member} = this.context.state;
         const {countryName, placard} = member;
-        const {raised, timeRaised} = placard || {}; // TODO: make always be in state
+        const {raised, timeRaised} = placard;
 
         return (
             <div className="card text-center" onClick={raised ? this.lowerPlacard : this.raisePlacard}>

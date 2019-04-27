@@ -1,4 +1,4 @@
-import {speakerNamespace} from "./index";
+import {speakerNamespace, uuids, getSocketsByUuid} from "./index";
 import {pick} from "./util";
 
 
@@ -79,8 +79,10 @@ export const sendPickedState = function (namespace, roomCode, properties, additi
 export const getMembers = function (type, roomCode) {
     return [...roomStates[roomCode][type]].map(
         ([uuid, member]) => {
-            member.uuid = uuid;
-            return member;
+            return {
+                ...member,
+                uuid,
+            };
         },
     );
 };

@@ -1,31 +1,35 @@
-import {uuids} from "./index";
+import {uuids, uuidInRoom, getSocketsByUuid} from "./index";
 import {sendState, sendPickedState, sendAudience, roomStates} from "./room";
 
 
 export const connect = function () {
+    const uuid = uuids.get(this);
+    const roomCode = uuidInRoom[uuid];
+    const member = roomCode && roomStates[roomCode].audience.get(uuid);
+
+    if (member) {
+        join.call(this, member, () => {});
+    }
+
     // eslint-disable-next-line no-console
     console.log("An audience member connected");
 };
 
 // When an audience member joins a room with a country name
-export const join = function (clientMember, reject) {
-    const {roomCode, countryName} = clientMember;
+export const join = function (member, reject) {
+    member.roomCode = member.roomCode.toUpperCase();
+    member.status = "connected";
+    member.placard = member.placard || {raised: false};
+    const {roomCode, countryName} = member;
     const uuid = uuids.get(this);
 
     // Rejections
-    if (!clientMember) return reject("Could not join a room because no data was passed to the server.");
+    if (!member) return reject("Could not join a room because no data was passed to the server.");
     if (!roomCode) return reject("Could not join a room because no room code was entered.");
     if (!countryName) return reject("Could not join a room because no country name was entered.");
     if (!(roomCode in roomStates)) return reject(`Could not join ${roomCode} as it doesn't exist or is no longer available.`);
 
-    // Re-make member object as to not inject state, normalize
-    const member = {
-        roomCode: clientMember.roomCode.toUpperCase(),
-        countryName,
-        placard: {
-            raised: false,
-        },
-    };
+    uuidInRoom[uuid] = roomCode;
 
     // Set the data in the audience Map
     roomStates[roomCode].audience.set(uuid, member);
@@ -49,6 +53,8 @@ export const leave = function (member) {
     member.roomCode = member.roomCode.toUpperCase();
     const {roomCode, countryName} = member;
     const uuid = uuids.get(this);
+
+    delete uuidInRoom[uuid];
 
     // Delete audience member
     roomStates[roomCode].audience.delete(uuid);
@@ -129,9 +135,6 @@ export const disconnecting = function (reason) {
     // Store rooms to update
     const rooms = Object.keys(this.rooms);
 
-    // Finish disconnecting so it leaves its rooms
-    this.disconnect();
-
     // Iterate over rooms
     for (const roomCode of rooms) {
         // Skip the room made for the ID
@@ -139,18 +142,22 @@ export const disconnecting = function (reason) {
             continue;
         }
 
-        // Delete the UUID entry for this socket (doesn't delete other sockets using the same UUID)
-        uuids.delete(this);
+        // Is there more than one sockets (before removal of this one)?
+        const hasOtherSockets = getSocketsByUuid(uuid).length > 1;
 
-        // TODO: set the status to disconnected and don't delete if they've voted or raised their placard. Then clean the audience out after voting stops or delete the specific member if their placard get's lowered by either the speaker. Allow the state of the disconnected user to be used when re-joining (just use the country name as a unique identifier for now)
+        // If there's no other live sockets
+        if (!hasOtherSockets) {
+            const member = roomStates[roomCode].audience.get(uuid);
+            // Mark disconnected
+            member.status = "disconnected";
 
-        // Delete audience member
-        const member = roomStates[roomCode].audience.get(uuid);
-        member.status = "disconnected"; // TODO check if others are using this ID
-
-        // Broadcast audience change to speakers in room
-        sendAudience(roomCode);
+            // Broadcast audience change to speakers in room
+            sendAudience(roomCode);
+        }
     }
+
+    // Delete the UUID entry for this socket (doesn't delete other sockets using the same UUID)
+    uuids.delete(this);
 
     // eslint-disable-next-line no-console
     console.log(`An audience member disconnected (${reason})`);
