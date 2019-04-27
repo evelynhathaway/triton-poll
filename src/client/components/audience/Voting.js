@@ -25,21 +25,21 @@ export default class Voting extends React.Component {
                     ) || (
                         <>
                             <button
-                                className={"btn btn-primary" + (voting ? "" : "disabled")}
+                                className={"btn btn-primary" + (voting ? "" : " disabled")}
                                 onClick={this.vote.bind(this, "yes")}
                                 disabled={voting ? "" : "disabled"}
                             >
                                 Yes
                             </button>
                             <button
-                                className={"btn btn-primary" + (voting ? "" : "disabled")}
+                                className={"btn btn-primary" + (voting ? "" : " disabled")}
                                 onClick={this.vote.bind(this, "no")}
                                 disabled={voting ? "" : "disabled"}
                             >
                                 No
                             </button>
                             <button
-                                className={"btn btn-primary" + (voting ? "" : "disabled")}
+                                className={"btn btn-primary" + (voting ? "" : " disabled")}
                                 onClick={this.vote.bind(this, "abstain")}
                                 disabled={voting ? "" : "disabled"}
                             >
