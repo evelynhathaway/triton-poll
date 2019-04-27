@@ -1,5 +1,4 @@
 import React from "react";
-import TimeAgo from "react-timeago";
 import {AppContext} from "../../contexts";
 
 
@@ -29,7 +28,7 @@ export default class Placard extends React.Component {
     render() {
         const {member} = this.context.state;
         const {countryName, placard} = member;
-        const {raised, timeRaised} = placard;
+        const {raised} = placard;
 
         return (
             <div id="placard">
@@ -44,11 +43,7 @@ export default class Placard extends React.Component {
                         <h5>{countryName}</h5>
                         {
                             raised && (
-                                <>
-                                    <span>Raised </span>
-                                    <TimeAgo minPeriod={3} date={timeRaised}/>
-                                    <span>, tap to lower</span>
-                                </>
+                                <span>Raised, tap to lower</span>
                             ) || (
                                 <span>Lowered, tap to raise</span>
                             )
