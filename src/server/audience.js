@@ -1,14 +1,23 @@
-import {uuids} from "./index";
-import {sendState, sendPickedState, sendAudience, roomStates} from "./room";
+import {uuids, uuidInRoom} from "./index";
+import {sendState, sendPickedState, sendAudience, roomStates, cleanUpAudienceMember, cleanUpAudience} from "./room";
 
 
 export const connect = function () {
+    const uuid = uuids.get(this);
+    const roomCode = uuidInRoom[uuid];
+    const member = roomCode && roomStates[roomCode].audience.get(uuid);
+
+    if (member) {
+        join.call(this, member, () => {});
+    }
+
     // eslint-disable-next-line no-console
     console.log("An audience member connected");
 };
 
 // When an audience member joins a room with a country name
 export const join = function (clientMember, reject) {
+    clientMember.roomCode = clientMember.roomCode.toUpperCase();
     const {roomCode, countryName} = clientMember;
     const uuid = uuids.get(this);
 
@@ -18,10 +27,13 @@ export const join = function (clientMember, reject) {
     if (!countryName) return reject("Could not join a room because no country name was entered.");
     if (!(roomCode in roomStates)) return reject(`Could not join ${roomCode} as it doesn't exist or is no longer available.`);
 
+    uuidInRoom[uuid] = roomCode;
+
     // Re-make member object as to not inject state, normalize
     const member = {
-        roomCode: clientMember.roomCode.toUpperCase(),
+        roomCode,
         countryName,
+        status: "connected",
         placard: {
             raised: false,
         },
@@ -49,6 +61,8 @@ export const leave = function (member) {
     member.roomCode = member.roomCode.toUpperCase();
     const {roomCode, countryName} = member;
     const uuid = uuids.get(this);
+
+    delete uuidInRoom[uuid];
 
     // Delete audience member
     roomStates[roomCode].audience.delete(uuid);
@@ -96,6 +110,9 @@ export const lowerPlacard = function (clientMember) {
         raised: false,
     };
 
+    // Remove members that were disconnected but had their placard up
+    cleanUpAudience(roomCode);
+
     sendState(this, roomCode, {member});
     sendAudience(roomCode);
 
@@ -124,13 +141,8 @@ export const vote = function (clientMember, position) {
 // Disconnection handler
 // - `disconnecting` instead of `disconnect` to capture the rooms to update
 export const disconnecting = function (reason) {
-    const uuid = uuids.get(this);
-
     // Store rooms to update
     const rooms = Object.keys(this.rooms);
-
-    // Finish disconnecting so it leaves its rooms
-    this.disconnect();
 
     // Iterate over rooms
     for (const roomCode of rooms) {
@@ -139,18 +151,11 @@ export const disconnecting = function (reason) {
             continue;
         }
 
-        // Delete the UUID entry for this socket (doesn't delete other sockets using the same UUID)
-        uuids.delete(this);
-
-        // TODO: set the status to disconnected and don't delete if they've voted or raised their placard. Then clean the audience out after voting stops or delete the specific member if their placard get's lowered by either the speaker. Allow the state of the disconnected user to be used when re-joining (just use the country name as a unique identifier for now)
-
-        // Delete audience member
-        const member = roomStates[roomCode].audience.get(uuid);
-        member.status = "disconnected"; // TODO check if others are using this ID
-
-        // Broadcast audience change to speakers in room
-        sendAudience(roomCode);
+        cleanUpAudienceMember(this, roomCode);
     }
+
+    // Delete the UUID entry for this socket (doesn't delete other sockets using the same UUID)
+    uuids.delete(this);
 
     // eslint-disable-next-line no-console
     console.log(`An audience member disconnected (${reason})`);

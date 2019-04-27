@@ -39,6 +39,7 @@ export const speakerNamespace = io.of("/speaker");
 
 
 export const uuids = new Map();
+export const uuidInRoom = {};
 
 export const getUuidFromCookie = function (cookie) {
     return /(?:^|;\s*)uuid\s*=\s*([^;]*)/.exec(cookie)?.[1];
@@ -104,7 +105,7 @@ audienceNamespace.on("connect", function (socket) {
     socket.on("vote", audience.vote);
 
     // Disconnection handler
-    socket.once("disconnecting", audience.disconnecting);
+    socket.on("disconnecting", audience.disconnecting);
 
     // Bubble up to audience submodule with `this` bound to `socket`
     audience.connect.apply(socket, arguments);
@@ -125,7 +126,7 @@ speakerNamespace.on("connect", function (socket) {
     socket.on("lower placard", speaker.lowerPlacard);
 
     // Disconnection handler
-    socket.once("disconnecting", speaker.disconnecting);
+    socket.on("disconnecting", speaker.disconnecting);
 
     // Bubble up to speaker submodule with `this` bound to `socket`
     speaker.connect.apply(socket, arguments);

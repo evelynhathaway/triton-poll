@@ -1,4 +1,4 @@
-import {speakerNamespace} from "./index";
+import {speakerNamespace, uuids, getSocketsByUuid} from "./index";
 import {pick} from "./util";
 
 
@@ -79,8 +79,10 @@ export const sendPickedState = function (namespace, roomCode, properties, additi
 export const getMembers = function (type, roomCode) {
     return [...roomStates[roomCode][type]].map(
         ([uuid, member]) => {
-            member.uuid = uuid;
-            return member;
+            return {
+                ...member,
+                uuid,
+            };
         },
     );
 };
@@ -94,4 +96,49 @@ export const sendAudience = function (roomCode) {
     sendState(speakerNamespace, roomCode, {
         audience: getAudience(roomCode),
     });
+};
+
+
+export const cleanUpAudienceMember = function (socket, roomCode) {
+    const uuid = uuids.get(socket);
+
+    // Is there more than one sockets (before removal of this one)?
+    const hasOtherSockets = getSocketsByUuid(uuid).length > 1;
+
+    // If there's no other live sockets
+    if (!hasOtherSockets) {
+        const member = roomStates[roomCode].audience.get(uuid);
+        const {vote, placard} = member;
+        const {raised} = placard;
+
+        if (raised || vote) {
+            // If there is a vote or placard up, keep alive but mark disconnected (differ to another clean up)
+            member.status = "disconnected";
+            console.log(`Deferred clean up of ${uuid}`);
+        } else {
+            // Delete the member from the Map as there's no data worth keeping
+            roomStates[roomCode].audience.delete(uuid);
+            console.log(`Cleaned up ${uuid} after disconnecting`);
+        }
+
+        // Broadcast audience change to speakers in room
+        sendAudience(roomCode);
+    }
+};
+export const cleanUpAudience = function (roomCode) {
+    let hasUpdated = false;
+
+    for (const [uuid, member] of roomStates[roomCode].audience) {
+        const {vote, placard, status} = member;
+        const {raised} = placard;
+
+        if (status === "disconnected" && !raised && !vote) {
+            // If there is not longer a vote or placard up, delete
+            roomStates[roomCode].audience.delete(uuid);
+            console.log(`Cleaned up ${uuid} after being deffered`);
+            hasUpdated = true;
+        }
+    }
+
+    return hasUpdated;
 };
