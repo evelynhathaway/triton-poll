@@ -1,4 +1,3 @@
-import {audienceNamespace} from "./index";
 import {sendState, sendPickedState, sendAudience, roomStates} from "./room";
 
 
@@ -78,8 +77,6 @@ export const raisePlacard = function (clientMember) {
         timeRaised: Date.now(),
     };
 
-    roomStates[roomCode].raisers.add(this);
-
     sendState(this, roomCode, {member});
     sendAudience(roomCode);
 
@@ -93,7 +90,6 @@ export const lowerPlacard = function (clientMember) {
     member.placard = {
         raised: false,
     };
-    roomStates[roomCode].raisers.delete(this);
 
     sendState(this, roomCode, {member});
     sendAudience(roomCode);
@@ -110,7 +106,6 @@ export const vote = function (clientMember, position) {
     }
 
     member.vote = position;
-    roomStates[roomCode].voters.add(this);
 
     sendState(this, roomCode, {member});
     sendAudience(roomCode);

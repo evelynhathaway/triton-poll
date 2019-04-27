@@ -1,5 +1,6 @@
 import express from "express";
 import SocketIO from "socket.io";
+import uuidv4 from "uuid/v4";
 import path from "path";
 
 // Room helper functions
@@ -35,6 +36,44 @@ export const io = SocketIO.listen(server);
 // Create namespaces for the audience and speakers
 export const audienceNamespace = io.of("/audience");
 export const speakerNamespace = io.of("/speaker");
+
+
+export const uuids = new Map();
+
+export const getUuidFromCookie = function (cookie) {
+    return /(?:^|;\s*)uuid\s*=\s*([^;]*)/.exec(cookie)?.[1];
+};
+export const getEntryByUuid = function (uuid) {
+    return [...uuids.entries()].find(([key, value]) => value === uuid);
+};
+export const getSocketByUuid = function (uuid) {
+    return getEntryByUuid(uuid)?.[0];
+};
+export const uuidMiddleware = function (socket, next) {
+    const handshakeData = socket.request;
+    const uuidFromCookie = getUuidFromCookie(handshakeData.headers.cookie);
+    const uuidMapEntry = uuidFromCookie && getEntryByUuid(uuidFromCookie);
+
+    if (!uuidMapEntry) {
+        // If there's no UUID set or found on the server's Map
+        const uuid = uuidv4();
+        uuids.set(socket, uuid);
+        socket.emit("uuid", uuid);
+    } else {
+        // Change socket key in the UUID Map
+        const [key, uuid] = uuidMapEntry;
+        uuids.delete(key);
+        uuids.set(socket, uuid);
+    }
+
+    next();
+};
+
+// Use UUID middleware on both namespaces
+// It cannot be added only to the root `io` server because the `socket` object before
+// switching namespaces is a different reference than after doing so
+audienceNamespace.use(uuidMiddleware);
+speakerNamespace.use(uuidMiddleware);
 
 
 // Make a debugging room if in development mode

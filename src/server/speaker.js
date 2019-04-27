@@ -1,4 +1,4 @@
-import {audienceNamespace, speakerNamespace} from "./index";
+import {audienceNamespace, speakerNamespace, getSocketByUuid} from "./index";
 import {lowerPlacard as lowerPlacardAudience} from "./audience";
 import {makeRoom, sendState, sendPickedState, roomStates, getAudience, getSpeakers, sendAudience} from "./room";
 
@@ -67,6 +67,7 @@ export const leave = function (member) {
 
 export const startVoting = function (member) {
     const {roomCode} = member;
+
     roomStates[roomCode].voting = true;
     sendPickedState(speakerNamespace, roomCode, ["voting"]);
     sendPickedState(audienceNamespace, roomCode, ["voting"]);
@@ -76,19 +77,18 @@ export const startVoting = function (member) {
 };
 export const endVoting = function (member) {
     const {roomCode} = member;
+
     roomStates[roomCode].voting = false;
+    sendPickedState(speakerNamespace, roomCode, ["voting"]);
+    sendPickedState(audienceNamespace, roomCode, ["voting"]);
 
     // Clear votes
-    for (const voterSocket of roomStates[roomCode].voters.keys()) {
-        const member = roomStates[roomCode].audience.get(voterSocket);
-        delete member.vote;
-        roomStates[roomCode].voters.delete(voterSocket);
-        sendState(voterSocket, roomCode, {member}); // TODO: make sure this doesn't error if the socket has closed
+    for (const [voterSocket, voterMember] of roomStates[roomCode].audience) {
+        delete voterMember.vote;
+        sendState(voterSocket, roomCode, {member: voterMember}); // TODO: make sure this doesn't error if the socket has closed
     }
 
     sendAudience(roomCode);
-    sendPickedState(speakerNamespace, roomCode, ["voting"]);
-    sendPickedState(audienceNamespace, roomCode, ["voting"]);
 
     // eslint-disable-next-line no-console
     console.log(`Voting has ended in ${roomCode}`);
@@ -96,9 +96,8 @@ export const endVoting = function (member) {
 
 export const lowerPlacard = function (members) {
     for (const member of members) {
-        // TODO: send and use UUID to uniquely id the memebers
-        // const memberSocket = roomStates[roomCode].audience.get()
-        // lowerPlacardAudience.call(member);
+        const memberSocket = getSocketByUuid(member.uuid);
+        lowerPlacardAudience.call(memberSocket, member);
     }
 };
 

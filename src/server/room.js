@@ -1,4 +1,4 @@
-import {speakerNamespace} from "./index";
+import {speakerNamespace, uuids} from "./index";
 import {pick} from "./util";
 
 
@@ -39,10 +39,6 @@ export const makeRoom = function (roomCode, initialState = {}) {
         committee: "",
         // Boolean for if the room is voting
         voting: false,
-        // Stored voters that only clear after voting stops
-        voters: new Set(),
-        // Stored memebers with raised placards that only clear after lowering
-        raisers: new Set(),
         // Initialize the stored audience members
         audience: new Map(),
         // Initialize the stored speakers
@@ -64,7 +60,7 @@ export const sendState = function (namespace, roomCode, data) {
     // Emit update state event
     // Don't send to a room if there isn't one or if it's a socket
     (!isSocket && roomCode ? namespace.to(roomCode) : namespace).emit(
-        "update state",
+        "set state",
         data,
     );
 };
@@ -81,7 +77,12 @@ export const sendPickedState = function (namespace, roomCode, properties, additi
 };
 
 export const getMembers = function (type, roomCode) {
-    return [...roomStates[roomCode][type].values()];
+    return [...roomStates[roomCode][type]].map(
+        ([socket, member]) => {
+            member.uuid = uuids.get(socket);
+            return member;
+        },
+    );
 };
 export const getAudience = function (roomCode) {
     return getMembers("audience", roomCode);

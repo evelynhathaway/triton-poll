@@ -17,7 +17,8 @@ export default class App extends React.Component {
     constructor() {
         super(...arguments);
 
-        this.updateState = this.updateState.bind(this);
+        this.setState = this.setState.bind(this);
+        this.setUuid = this.setUuid.bind(this);
         this.connect = this.connect.bind(this);
         this.disconnect = this.disconnect.bind(this);
         this.connected = this.connected.bind(this);
@@ -31,23 +32,11 @@ export default class App extends React.Component {
         speakers: [],
         voting: false,
         status: "disconnected",
-        member: sessionStorage.member ?
-            JSON.parse(sessionStorage.member) :
-            {
-                placard: {
-                    raised: false,
-                },
+        member: {
+            placard: {
+                raised: false,
             },
-    }
-
-    updateState(state) {
-        // Store room, country name, etc. if set
-        if (typeof state.member !== "undefined") {
-            sessionStorage.member = JSON.stringify(state.member);
-        }
-
-        // Forward to React
-        this.setState(state);
+        },
     }
 
     connect(namespace) {
@@ -58,25 +47,24 @@ export default class App extends React.Component {
         this.socket = io(socketPath);
 
         // Handlers
-        this.socket.on("connect", this.connected.bind(this));
-        this.socket.on("disconnect", this.disconnected.bind(this));
-        this.socket.on("update state", this.updateState.bind(this));
+        this.socket.on("uuid", this.setUuid);
+        this.socket.on("connect", this.connected);
+        this.socket.on("disconnect", this.disconnected);
+        this.socket.on("set state", this.setState);
     }
     disconnect() {
         this.socket.disconnect();
         this.socket = undefined;
     }
 
-    connected() {
-        const {member} = this.state;
+    setUuid(uuid) {
+        document.cookie = `uuid=${uuid}`;
+    }
 
+    connected() {
         this.setState({
             status: "connected",
         });
-
-        if (member?.roomCode) {
-            this.join(member);
-        }
     }
     disconnected() {
         this.setState({
