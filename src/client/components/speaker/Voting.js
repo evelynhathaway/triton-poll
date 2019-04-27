@@ -38,6 +38,7 @@ export default class Voting extends React.Component {
             (results, member) => {
                 if (member.vote) {
                     results[member.vote]++;
+                    member.vote !== "abstain" && results.votingTotal++;
                     results.total++;
                 }
                 return results;
@@ -46,6 +47,7 @@ export default class Voting extends React.Component {
                 yes: 0,
                 no: 0,
                 abstain: 0,
+                votingTotal: 0,
                 total: 0,
             },
         );
@@ -53,7 +55,7 @@ export default class Voting extends React.Component {
 
     render() {
         const {voting} = this.context.state;
-        const {yes, no, abstain, total} = this.makeResults();
+        const {yes, no, abstain, total, votingTotal} = this.makeResults();
 
         return (
             <div id="voting">
@@ -88,6 +90,12 @@ export default class Voting extends React.Component {
                                 <td>{this.makePercent(yes, total)}</td>
                                 <td>{this.makePercent(no, total)}</td>
                                 <td>{this.makePercent(abstain, total)}</td>
+                                <td>100%</td>
+                            </tr>
+                            <tr>
+                                <td>{this.makePercent(yes, votingTotal)}</td>
+                                <td>{this.makePercent(no, votingTotal)}</td>
+                                <td>Excluded</td>
                                 <td>100%</td>
                             </tr>
                         </tbody>
