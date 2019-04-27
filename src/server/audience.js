@@ -1,3 +1,4 @@
+import {uuids} from "./index";
 import {sendState, sendPickedState, sendAudience, roomStates} from "./room";
 
 
@@ -9,6 +10,7 @@ export const connect = function () {
 // When an audience member joins a room with a country name
 export const join = function (clientMember, reject) {
     const {roomCode, countryName} = clientMember;
+    const uuid = uuids.get(this);
 
     // Rejections
     if (!clientMember) return reject("Could not join a room because no data was passed to the server.");
@@ -26,7 +28,7 @@ export const join = function (clientMember, reject) {
     };
 
     // Set the data in the audience Map
-    roomStates[roomCode].audience.set(this, member);
+    roomStates[roomCode].audience.set(uuid, member);
     // Join room with socket
     this.join(roomCode);
     // Send initial state
@@ -46,9 +48,10 @@ export const join = function (clientMember, reject) {
 export const leave = function (member) {
     member.roomCode = member.roomCode.toUpperCase();
     const {roomCode, countryName} = member;
+    const uuid = uuids.get(this);
 
     // Delete audience member
-    roomStates[roomCode].audience.delete(this);
+    roomStates[roomCode].audience.delete(uuid);
     // Leave room with socket
     this.leave(roomCode);
     // Send empty state
@@ -70,7 +73,8 @@ export const leave = function (member) {
 
 export const raisePlacard = function (clientMember) {
     const {roomCode, countryName} = clientMember;
-    const member = roomStates[roomCode].audience.get(this);
+    const uuid = uuids.get(this);
+    const member = roomStates[roomCode].audience.get(uuid);
 
     member.placard = {
         raised: true,
@@ -85,7 +89,8 @@ export const raisePlacard = function (clientMember) {
 };
 export const lowerPlacard = function (clientMember) {
     const {roomCode, countryName} = clientMember;
-    const member = roomStates[roomCode].audience.get(this);
+    const uuid = uuids.get(this);
+    const member = roomStates[roomCode].audience.get(uuid);
 
     member.placard = {
         raised: false,
@@ -99,7 +104,8 @@ export const lowerPlacard = function (clientMember) {
 };
 export const vote = function (clientMember, position) {
     const {roomCode, countryName} = clientMember;
-    const member = roomStates[roomCode].audience.get(this);
+    const uuid = uuids.get(this);
+    const member = roomStates[roomCode].audience.get(uuid);
 
     if (!roomStates[roomCode].voting) {
         return; // TODO: reject
@@ -118,6 +124,8 @@ export const vote = function (clientMember, position) {
 // Disconnection handler
 // - `disconnecting` instead of `disconnect` to capture the rooms to update
 export const disconnecting = function (reason) {
+    const uuid = uuids.get(this);
+
     // Store rooms to update
     const rooms = Object.keys(this.rooms);
 
@@ -131,10 +139,15 @@ export const disconnecting = function (reason) {
             continue;
         }
 
+        // Delete the UUID entry for this socket (doesn't delete other sockets using the same UUID)
+        uuids.delete(this);
+
         // TODO: set the status to disconnected and don't delete if they've voted or raised their placard. Then clean the audience out after voting stops or delete the specific member if their placard get's lowered by either the speaker. Allow the state of the disconnected user to be used when re-joining (just use the country name as a unique identifier for now)
 
         // Delete audience member
-        roomStates[roomCode].audience.delete(this);
+        const member = roomStates[roomCode].audience.get(uuid);
+        member.status = "disconnected"; // TODO check if others are using this ID
+
         // Broadcast audience change to speakers in room
         sendAudience(roomCode);
     }

@@ -1,4 +1,4 @@
-import {audienceNamespace, speakerNamespace, getSocketByUuid} from "./index";
+import {audienceNamespace, speakerNamespace, getSocketsByUuid, uuids} from "./index";
 import {lowerPlacard as lowerPlacardAudience} from "./audience";
 import {makeRoom, sendState, sendPickedState, roomStates, getAudience, getSpeakers, sendAudience} from "./room";
 
@@ -14,6 +14,7 @@ export const join = function (member, reject) {
     member.speaker = true;
     const {roomCode} = member;
     const {committee} = roomStates[roomCode];
+    const uuid = uuids.get(this);
 
     // Rejections
     if (!member) return reject("Could not join a room because no data was passed to the server.");
@@ -21,7 +22,7 @@ export const join = function (member, reject) {
     if (!(roomCode in roomStates)) return reject(`Could not join ${roomCode} as it doesn't exist or is no longer available.`);
 
     // Set the data in the speakers Map
-    roomStates[roomCode].speakers.set(this, member);
+    roomStates[roomCode].speakers.set(uuid, member);
 
     // Join room with socket
     this.join(roomCode);
@@ -43,9 +44,10 @@ export const join = function (member, reject) {
 export const leave = function (member) {
     const {roomCode} = member;
     const {committee} = roomStates[roomCode];
+    const uuid = uuids.get(this);
 
     // Delete speaker
-    roomStates[roomCode].speakers.delete(this);
+    roomStates[roomCode].speakers.delete(uuid);
     // Leave room with socket
     this.leave(roomCode);
     // Send empty state
@@ -83,9 +85,12 @@ export const endVoting = function (member) {
     sendPickedState(audienceNamespace, roomCode, ["voting"]);
 
     // Clear votes
-    for (const [voterSocket, voterMember] of roomStates[roomCode].audience) {
+    for (const [voterUuid, voterMember] of roomStates[roomCode].audience) {
         delete voterMember.vote;
-        sendState(voterSocket, roomCode, {member: voterMember}); // TODO: make sure this doesn't error if the socket has closed
+        const voterSockets = getSocketsByUuid(voterUuid);
+        for (const voterSocket of voterSockets) {
+            sendState(voterSocket, roomCode, {member: voterMember}); // TODO: make sure this doesn't error if the socket has closed
+        }
     }
 
     sendAudience(roomCode);
@@ -96,8 +101,10 @@ export const endVoting = function (member) {
 
 export const lowerPlacard = function (members) {
     for (const member of members) {
-        const memberSocket = getSocketByUuid(member.uuid);
-        lowerPlacardAudience.call(memberSocket, member);
+        const memberSockets = getSocketsByUuid(member.uuid);
+        for (const memberSocket of memberSockets) {
+            lowerPlacardAudience.call(memberSocket, member);
+        }
     }
 };
 
@@ -141,6 +148,8 @@ export const createRoom = function (data, reject) {
 // Disconnection handler
 // - `disconnecting` instead of `disconnect` to capture the rooms to update
 export const disconnecting = function (reason) {
+    const uuid = uuids.get(this);
+
     // Store rooms to update
     const rooms = Object.keys(this.rooms);
 
@@ -154,11 +163,13 @@ export const disconnecting = function (reason) {
             continue;
         }
 
-        // Delete speaker
-        roomStates[roomCode].speakers.delete(this);
-        // Broadcast speaker change to speakers in room
-        // sendAudience(roomCode); // TODO speakers
+        // Delete the UUID entry for this socket (doesn't delete other sockets using the same UUID)
+        uuids.delete(this);
 
+        // Delete speaker
+        roomStates[roomCode].speakers.delete(uuid); // TODO: don't delete?
+        // Broadcast speaker change to other speakers in room
+        // sendAudience(roomCode); // TODO speakers
     }
 
     // eslint-disable-next-line no-console

@@ -12,7 +12,6 @@ import Whoops404 from "./routes/Whoops404";
 import {AppContext} from "./contexts";
 
 
-// TODO: use socket context for moving around socket?
 export default class App extends React.Component {
     constructor() {
         super(...arguments);

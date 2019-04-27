@@ -43,29 +43,33 @@ export const uuids = new Map();
 export const getUuidFromCookie = function (cookie) {
     return /(?:^|;\s*)uuid\s*=\s*([^;]*)/.exec(cookie)?.[1];
 };
-export const getEntryByUuid = function (uuid) {
-    return [...uuids.entries()].find(([key, value]) => value === uuid);
+export const hasUuidEntry = function (uuid) {
+    return [...uuids.values()].includes(uuid);
 };
-export const getSocketByUuid = function (uuid) {
-    return getEntryByUuid(uuid)?.[0];
+export const getEntriesByUuid = function (uuid) {
+    return [...uuids].filter(([key, value]) => value === uuid);
 };
+export const getSocketsByUuid = function (uuid) {
+    return getEntriesByUuid(uuid)?.map(([socket]) => socket);
+};
+
 export const uuidMiddleware = function (socket, next) {
     const handshakeData = socket.request;
-    const uuidFromCookie = getUuidFromCookie(handshakeData.headers.cookie);
-    const uuidMapEntry = uuidFromCookie && getEntryByUuid(uuidFromCookie);
+    // Initialize with the cookie from the client
+    let uuid = getUuidFromCookie(handshakeData.headers.cookie);
 
-    if (!uuidMapEntry) {
-        // If there's no UUID set or found on the server's Map
-        const uuid = uuidv4();
-        uuids.set(socket, uuid);
+    // If there's no UUID set or it's set but it's found on the server
+    if (!uuid && !hasUuidEntry(uuid)) {
+        // Create a new UUID
+        uuid = uuidv4();
+        // Instruct the client to remember it
         socket.emit("uuid", uuid);
-    } else {
-        // Change socket key in the UUID Map
-        const [key, uuid] = uuidMapEntry;
-        uuids.delete(key);
-        uuids.set(socket, uuid);
     }
 
+    // Add this socket key in the UUID Map
+    uuids.set(socket, uuid);
+
+    // Pass along to next Socket-IO middleware
     next();
 };
 
@@ -129,6 +133,5 @@ speakerNamespace.on("connect", function (socket) {
 
 
 // eslint-disable-next-line no-console
-// TODO: change back to localhost
 // TODO: use relative URL for development when I remove browsersync
 console.log(`Server is running at ${DEVELOPMENT ? "localhost:8080" : "poll.tritonmun.org"}/`);
