@@ -10,16 +10,9 @@ export default class Footer extends React.Component {
         const leave = this.context.leave.bind(this.context);
 
         return (
-            <footer id="header-text">
-                {/* Conference name, session */}
-                <div>
-                    <p>Triton MUN - Session XIX</p>
-                </div>
-
+            <footer id="footer">
                 {/* Leave room */}
-                <div>
-                    {roomCode && <button className="btn btn-outline-dark" onClick={leave}>Leave room</button>}
-                </div>
+                {roomCode && <button className="btn btn-outline-dark" onClick={leave}>Leave room</button>}
             </footer>
         );
     }

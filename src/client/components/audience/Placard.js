@@ -32,19 +32,28 @@ export default class Placard extends React.Component {
         const {raised, timeRaised} = placard;
 
         return (
-            <div className="card text-center" onClick={raised ? this.lowerPlacard : this.raisePlacard}>
-                <div className="card-body">
-                    <h5>{countryName}</h5>
-                    {
-                        raised && (
-                            <>
-                                <span>Raised </span>
-                                <TimeAgo minPeriod={3} date={timeRaised} className="text-muted"/>
-                            </>
-                        ) || (
-                            <span>Lowered, tap to raise</span>
-                        )
-                    }
+            <div id="placard">
+                <h2 className="my-3">Placard</h2>
+                <p>Tap to raise your placard to get the attention of a chair, make motions, or to be added to the speaker's list.</p>
+
+                <div
+                    className={"card text-center my-3 placard" + (raised ? " raised" : "")}
+                    onClick={raised ? this.lowerPlacard : this.raisePlacard}
+                >
+                    <div className="card-body">
+                        <h5>{countryName}</h5>
+                        {
+                            raised && (
+                                <>
+                                    <span>Raised </span>
+                                    <TimeAgo minPeriod={3} date={timeRaised}/>
+                                    <span>, tap to lower</span>
+                                </>
+                            ) || (
+                                <span>Lowered, tap to raise</span>
+                            )
+                        }
+                    </div>
                 </div>
             </div>
         );

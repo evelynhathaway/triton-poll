@@ -1,13 +1,16 @@
 import React from "react";
 import TimeAgo from "react-timeago";
+import {AppContext} from "../../contexts";
 
 
 export default class Placard extends React.Component {
+    static contextType = AppContext
+
     lowerPlacard() {
         const {socket} = this.context;
         const {member} = this.props;
 
-        socket.emit("lower placard", member);
+        socket.emit("lower placard", [member]);
     }
 
     render() {
@@ -15,11 +18,12 @@ export default class Placard extends React.Component {
         const {timeRaised} = placard;
 
         return (
-            // TODO cursor
-            <div className="card text-center" onClick={this.lowerPlacard.bind(this)}>
+            <div className="card text-center my-3 placard" onClick={this.lowerPlacard.bind(this)}>
                 <div className="card-body">
                     <h5>{countryName}</h5>
-                    <TimeAgo minPeriod={3} date={timeRaised} className="text-muted"/>
+                    <span>Raised </span>
+                    <TimeAgo minPeriod={3} date={timeRaised}/>
+                    <span>, tap to lower</span>
                 </div>
             </div>
         );

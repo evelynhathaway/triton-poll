@@ -119,7 +119,7 @@ export const lowerPlacard = function (members) {
         sendAudience(roomCode);
 
         // eslint-disable-next-line no-console
-        console.log(`${countryName} lowered their placard`);
+        console.log(`A speaker lowered ${countryName}'s placard`);
     }
 };
 

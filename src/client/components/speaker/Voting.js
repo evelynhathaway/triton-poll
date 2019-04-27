@@ -58,6 +58,7 @@ export default class Voting extends React.Component {
         return (
             <div id="voting">
                 <h2 className="my-3">Voting</h2>
+                <p>The vote totals and percentage are shown here. Click <em>Start</em> to start asking for votes and <em>Clear and End</em> to stop taking votes and clear the table.</p>
 
                 <button
                     className={"btn btn-primary"}

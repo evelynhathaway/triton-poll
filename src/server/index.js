@@ -134,5 +134,4 @@ speakerNamespace.on("connect", function (socket) {
 
 
 // eslint-disable-next-line no-console
-// TODO: use relative URL for development when I remove browsersync
 console.log(`Server is running at ${DEVELOPMENT ? "localhost:8080" : "poll.tritonmun.org"}/`);

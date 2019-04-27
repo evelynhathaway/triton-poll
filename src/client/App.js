@@ -39,7 +39,7 @@ export default class App extends React.Component {
     }
 
     connect(namespace) {
-        const socketAddress = (process.env.NODE_ENV === "development" ? "http://localhost:8080" : "");
+        const socketAddress = (process.env.NODE_ENV === "development" ? ":8080" : "");
         const socketPath = `${socketAddress}/${namespace}`;
 
         // Create socket from `io`
@@ -83,23 +83,25 @@ export default class App extends React.Component {
     render() {
         return (
             <AppContext.Provider value={this}>
-                {/* Header */}
-                <Header/>
+                <div id="content">
+                    {/* Header */}
+                    <Header/>
 
-                {/* Disconnection alert banner */}
-                <AlertBanner/>
+                    {/* Disconnection alert banner */}
+                    <AlertBanner/>
 
-                {/* Browser history client-side router */}
-                <Router>
-                    <Switch>
-                        {/* Audience page */}
-                        <Route path="/" exact component={Audience}/>
-                        {/* Speaker page */}
-                        <Route path="/speaker/" component={Speaker}/>
-                        {/* If no match, render the `route not found` page (doesn't explictly return HTTP 404) */}
-                        <Route component={Whoops404}/>
-                    </Switch>
-                </Router>
+                    {/* Browser history client-side router */}
+                    <Router>
+                        <Switch>
+                            {/* Audience page */}
+                            <Route path="/" exact component={Audience}/>
+                            {/* Speaker page */}
+                            <Route path="/speaker/" component={Speaker}/>
+                            {/* If no match, render the `route not found` page (doesn't explictly return HTTP 404) */}
+                            <Route component={Whoops404}/>
+                        </Switch>
+                    </Router>
+                </div>
 
                 {/* Footer */}
                 <Footer/>
