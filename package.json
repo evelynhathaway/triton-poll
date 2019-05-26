@@ -18,16 +18,21 @@
   ],
   "main": "app-server.js",
   "scripts": {
-    "build": "run-p build:*",
-    "build:client": "webpack",
-    "build:server": "babel ./src/server -d ./lib",
-    "build:watch": "cross-env NODE_ENV=development webpack -w",
-    "dev": "cross-env NODE_ENV=development run-p -l build:watch dev:start",
-    "dev:start": "npm run build:server && cross-env NODE_ENV=development node ./lib/index.js",
+    "build": "run-p --aggregate-output build:*",
+    "build-watch": "run-p -l build-watch:*",
+    "build-watch:client": "cross-env NODE_ENV=development webpack -w",
+    "build-watch:server": "cross-env NODE_ENV=development babel -w ./src/server -d ./lib",
+    "build:client": "cross-env NODE_ENV=production webpack",
+    "build:server": "cross-env NODE_ENV=production babel ./src/server -d ./lib",
+    "dev": "run-p -l build-watch dev:start",
+    "dev:start": "cross-env NODE_ENV=development nodemon ./lib/index.js -w ./lib",
     "dev:sync": "browser-sync start --proxy \"localhost:8080\" --files \"public/*\"",
     "lint": "eslint --ext .js ./",
-    "prestart": "cross-env NODE_ENV=production run-p --aggregate-output build:client build:server",
-    "start": "cross-env NODE_ENV=production node ./lib/index.js"
+    "prereload": "npm run build",
+    "reload": "cross-env NODE_ENV=production forever restart ./lib/index.js",
+    "prestart": "npm run build",
+    "start": "cross-env NODE_ENV=production forever start ./lib/index.js",
+    "stop": "forever stop ./lib/index.js"
   },
   "dependencies": {
     "bootstrap": "^4.3.1",
@@ -54,6 +59,8 @@
     "eslint": "^6.0.0-alpha.2",
     "eslint-plugin-evelyn": "^1.0.0-alpha.0",
     "eslint-plugin-node": "^9.1.0",
+    "forever": "^1.0.0",
+    "nodemon": "^1.19.1",
     "npm-run-all": "^4.1.5",
     "webpack": "^4.32.2",
     "webpack-cli": "^3.3.2"
