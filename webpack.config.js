@@ -5,7 +5,7 @@ module.exports = {
     entry: "./src/client/App.js",
     output: {
         path: path.resolve(__dirname, "public"),
-        filename: "bundle.js"
+        filename: "bundle.js",
     },
     module: {
         rules: [
@@ -20,23 +20,23 @@ module.exports = {
                                 "@babel/preset-react",
                                 {
                                     development: process.env.NODE_ENV === "development",
-                                }
+                                },
                             ],
                             [
                                 "@babel/preset-env",
                                 {
-                                    targets: "> 0.25%, not dead"
-                                }
-                            ]
+                                    targets: "> 0.25%, not dead",
+                                },
+                            ],
                         ],
                         plugins: [
                             "@babel/plugin-proposal-class-properties",
                             "@babel/plugin-proposal-optional-chaining",
-                            "transform-node-env-inline"
-                        ]
-                    }
-                }
-            }
-        ]
-    }
+                            "transform-node-env-inline",
+                        ],
+                    },
+                },
+            },
+        ],
+    },
 };

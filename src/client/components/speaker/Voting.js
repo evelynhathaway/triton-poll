@@ -104,4 +104,4 @@ export default class Voting extends React.Component {
             </div>
         );
     }
-};
+}

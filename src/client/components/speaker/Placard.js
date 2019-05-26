@@ -13,7 +13,7 @@ export default class Placard extends React.Component {
     }
 
     render() {
-        const {countryName, placard} = this.props.member;
+        const {countryName} = this.props.member;
 
         return (
             <div className="card text-center my-3 placard" onClick={this.lowerPlacard.bind(this)}>
@@ -24,4 +24,4 @@ export default class Placard extends React.Component {
             </div>
         );
     }
-};
+}

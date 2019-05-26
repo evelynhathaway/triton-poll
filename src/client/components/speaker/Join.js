@@ -94,4 +94,4 @@ export default class JoinSpeaker extends React.Component {
             </div>
         );
     }
-};
+}

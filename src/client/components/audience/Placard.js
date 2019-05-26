@@ -53,4 +53,4 @@ export default class Placard extends React.Component {
             </div>
         );
     }
-};
+}

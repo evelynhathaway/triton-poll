@@ -14,4 +14,4 @@ export default class Whoops404 extends React.Component {
             </div>
         );
     }
-};
+}

@@ -40,4 +40,4 @@ export default class Attendance extends React.Component {
             </div>
         );
     }
-};
+}

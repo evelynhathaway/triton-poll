@@ -38,4 +38,4 @@ export default class Placards extends React.Component {
             </div>
         );
     }
-};
+}
