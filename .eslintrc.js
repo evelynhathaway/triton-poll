@@ -1,39 +1,48 @@
-const extend = require("eslint-plugin-evelyn/lib/extend");
-
-
 module.exports = {
 	"plugins": [
-		"evelyn"
+		"evelyn",
 	],
 	"extends": [
-		"plugin:evelyn/default"
+		"plugin:evelyn/default",
 	],
-	rules: {
+	"rules": {
 		"indent": [
 			"error",
-			4
-		]
+			4,
+		],
 	},
 	"overrides": [
 		// All src files use node and source configs
-		extend(
-			"node",
-			"source",
-			{
-				"files": [
-					"src/server/**/*.js",
-				]
-			}
-		),
-		extend(
-			"jsx",
-			"browser",
-			{
-				"files": [
-					"src/client/**/*.js",
-				],
-				"parser": "babel-eslint"
-			}
-		)
-	]
+		{
+			"files": [
+				"src/server/**/*.js",
+			],
+			"extends": [
+				"plugin:evelyn/node",
+				"plugin:evelyn/source",
+			],
+			"parser": "babel-eslint",
+		},
+		{
+			"files": [
+				"src/client/**/*.js",
+			],
+			"extends": [
+				"plugin:evelyn/browser",
+				"plugin:evelyn/jsx",
+			],
+			"parser": "babel-eslint",
+		},
+		{
+			"files": [
+				"*.config.js",
+				".*rc.js",
+				".*rc",
+			],
+			"parser": "babel-eslint",
+			"extends": [
+				"plugin:evelyn/node",
+			],
+		},
+	],
 };
