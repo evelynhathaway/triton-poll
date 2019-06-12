@@ -48,7 +48,7 @@ export const hasUuidEntry = function (uuid) {
     return [...uuids.values()].includes(uuid);
 };
 export const getEntriesByUuid = function (uuid) {
-    return [...uuids].filter(([key, value]) => value === uuid);
+    return [...uuids].filter(([, value]) => value === uuid);
 };
 export const getSocketsByUuid = function (uuid) {
     return getEntriesByUuid(uuid)?.map(([socket]) => socket);

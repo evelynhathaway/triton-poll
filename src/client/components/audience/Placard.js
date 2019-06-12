@@ -33,7 +33,7 @@ export default class Placard extends React.Component {
         return (
             <div id="placard">
                 <h2 className="my-3">Placard</h2>
-                <p>Tap to raise your placard to get the attention of a chair, make motions, or to be added to the speaker's list.</p>
+                <p>Tap to raise your placard to get the attention of a chair, make motions, or to be added to the speaker&apos;s list.</p>
 
                 <div
                     className={"card text-center my-3 placard" + (raised ? " raised" : "")}

@@ -123,7 +123,7 @@ export const lowerPlacard = function (members) {
     }
 };
 
-export const listRooms = function (resolve, reject) {
+export const listRooms = function (resolve) {
     resolve({
         // Create an array of rooms for the client to display if wanting to join an existing room
         rooms: Object.keys(roomStates).map(roomCode => {

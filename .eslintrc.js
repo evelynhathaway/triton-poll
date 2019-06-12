@@ -2,47 +2,46 @@ module.exports = {
 	"plugins": [
 		"evelyn",
 	],
+
 	"extends": [
 		"plugin:evelyn/default",
 	],
+
+	"parser": "babel-eslint",
+
 	"rules": {
 		"indent": [
 			"error",
 			4,
 		],
 	},
+
 	"overrides": [
-		// All src files use node and source configs
+		// Server source files and configs
 		{
 			"files": [
 				"src/server/**/*.js",
+				"*.config.js",
+				".*rc.js",
+				".*rc",
 			],
 			"extends": [
 				"plugin:evelyn/node",
 				"plugin:evelyn/source",
 			],
-			"parser": "babel-eslint",
 		},
+		// Client source files
 		{
 			"files": [
 				"src/client/**/*.js",
 			],
 			"extends": [
-				"plugin:evelyn/browser",
-				"plugin:evelyn/jsx",
+				"plugin:evelyn/react",
 			],
-			"parser": "babel-eslint",
-		},
-		{
-			"files": [
-				"*.config.js",
-				".*rc.js",
-				".*rc",
-			],
-			"parser": "babel-eslint",
-			"extends": [
-				"plugin:evelyn/node",
-			],
+			"globals": {
+				// `process.env.NODE_ENV` webpack/babel evaluation
+				"process": "readonly",
+			},
 		},
 	],
 };

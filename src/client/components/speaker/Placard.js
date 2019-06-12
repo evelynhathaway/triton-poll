@@ -1,9 +1,15 @@
 import React from "react";
+import PropTypes from "prop-types";
+
 import {AppContext} from "../../contexts";
 
 
 export default class Placard extends React.Component {
     static contextType = AppContext
+
+    static propTypes = {
+        member: PropTypes.object.isRequired,
+    }
 
     lowerPlacard() {
         const {socket} = this.context;

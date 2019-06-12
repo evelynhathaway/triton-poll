@@ -1,4 +1,4 @@
-import {speakerNamespace, uuids, getSocketsByUuid} from "./index";
+import {speakerNamespace} from "./index";
 import {pick} from "./util";
 
 
@@ -17,7 +17,7 @@ export const makeRoomCode = function () {
         roomCode = String.fromCharCode(
             // Fill array with `roomCodeLength` number of random numbers corresponding
             // to uppercase char codes, spread into `fromCharCode`'s ...args
-            ...Array(roomCodeLength)
+            ...new Array(roomCodeLength)
                 .fill()
                 // Random number between 65 through 90, inclusive
                 .map(() => Math.round(Math.random() * 25) + 65)
