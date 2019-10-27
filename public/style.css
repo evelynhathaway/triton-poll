@@ -90,7 +90,7 @@ form label {
 
 .placards {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: 1fr;
 }
 
 .placards:empty::after {
@@ -118,5 +118,20 @@ form label {
     }
     #header .room-code-small {
         display: inline;
+    }
+}
+
+
+@media screen and (min-width: 576px) {
+    .placards {
+        gap: 1rem;
+        grid-gap: 1rem;
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media screen and (min-width: 768px) {
+    .placards {
+        grid-template-columns: repeat(3, 1fr);
     }
 }
