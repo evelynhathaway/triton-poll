@@ -10,7 +10,7 @@ form button {
 
 form label {
     font-size: 1.25rem;
-    margin-top: 0.25rem;
+    margin-top: 1.25rem;
 }
 
 .table td,
@@ -71,8 +71,45 @@ form label {
 .placard.raised {
     background-color: #5aaaff;
     border: 1px solid rgb(0, 108, 222);
-	color: #fff;
+    color: #fff;
     box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+.btn-primary {
+    background-color: #0071eb;
+    border-color: #0071eb;
+}
+
+.btn-primary.disabled,
+.btn-primary:disabled {
+    background-color: #eee;
+    border-color: #ddd;
+    color: #696969;
+    opacity: 1;
+}
+
+.placards {
+    display: grid;
+    grid-template-columns: 1fr;
+}
+
+.placards:empty::after {
+    align-items: center;
+    background-color: #eee;
+    content: 'Votes will appear here';
+    position: relative;
+    display: -ms-flexbox;
+    display: flex;
+    height: 98px;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    justify-content: center;
+    margin: 1rem 0;
+    min-width: 0;
+    word-wrap: break-word;
+    background-clip: border-box;
+    border: 1px solid rgba(0,0,0,.125);
+    border-radius: .25rem;
 }
 
 @media screen and (max-width: 575.98px) {
@@ -81,5 +118,20 @@ form label {
     }
     #header .room-code-small {
         display: inline;
+    }
+}
+
+
+@media screen and (min-width: 576px) {
+    .placards {
+        gap: 1rem;
+        grid-gap: 1rem;
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media screen and (min-width: 768px) {
+    .placards {
+        grid-template-columns: repeat(3, 1fr);
     }
 }
