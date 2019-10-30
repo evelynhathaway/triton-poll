@@ -24,11 +24,21 @@ module.exports = {
 				"*.config.js",
 				".*rc.js",
 				".*rc",
+				"gulpfile.js",
 			],
 			"extends": [
 				"plugin:evelyn/node",
 				"plugin:evelyn/source",
 			],
+		},
+		// Ignore Unplublished for Using Dev Deps
+		{
+			"files": [
+				"gulpfile.js",
+			],
+			"rules": {
+				"node/no-unpublished-require": "off",
+			},
 		},
 		// Client source files
 		{

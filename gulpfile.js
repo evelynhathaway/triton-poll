@@ -1,23 +1,23 @@
-const gulp = require('gulp');
-const plumber = require('gulp-plumber');
-const postcss = require('gulp-postcss');
-const autoprefixer = require('autoprefixer');
-const groupmq = require('gulp-group-css-media-queries');
+const gulp = require("gulp");
+const plumber = require("gulp-plumber");
+const postcss = require("gulp-postcss");
+const autoprefixer = require("autoprefixer");
+const groupmq = require("gulp-group-css-media-queries");
 
 const STYLE_SOURCES = [
-    './public/**/*.css',
+    "./public/**/*.css",
 ];
 
 function prefixStyles() {
-    return gulp.src(STYLE_SOURCES, { base: './' })
+    return gulp.src(STYLE_SOURCES, {base: "./"})
         .pipe(plumber())
         .pipe(postcss([
             autoprefixer({
-                cascade: false
-            })
+                cascade: false,
+            }),
         ]))
         .pipe(groupmq())
-        .pipe(gulp.dest('.'));
+        .pipe(gulp.dest("."));
 }
 exports.prefixStyles = prefixStyles;
 
