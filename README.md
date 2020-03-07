@@ -1,12 +1,22 @@
+<div align="center">
+
+<img alt="Triton Poll logo" width="128" height="128" align="center" src="public/img/favicon/favicon-192.png"/>
+
 # Triton Poll
 
-[![license](https://badgen.net/badge/license/MIT/blue)](/LICENSE)
+**Live virtual voting and placard rasing for Model United Nations conferences**
 
-Live virtual voting and placard rasing for Model United Nations conferences. It utilizes WebSockets to send messages between a client written in React.js and a server written in Node.js.
+[![license: MIT](https://badgen.net/badge/license/MIT/blue)](/LICENSE)
+
+</div>
+
+## Description
+
+Custom web app utilizing WebSockets to send messages between a React.js client and a Node.js server.
 
 ## Screenshot
 
-![Screenshot](/.github/screenshot.png)
+![Screenshot](.github/screenshot.png)
 
 Pictured on the left is the audience view with their placard raised, and the right is the speaker view in the same committee.
 
