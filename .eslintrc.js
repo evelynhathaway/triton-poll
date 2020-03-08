@@ -5,16 +5,8 @@ module.exports = {
 
 	"extends": [
 		"plugin:evelyn/default",
+		"plugin:evelyn/babel",
 	],
-
-	"parser": "babel-eslint",
-
-	"rules": {
-		"indent": [
-			"error",
-			4,
-		],
-	},
 
 	"overrides": [
 		// Server source files and configs
