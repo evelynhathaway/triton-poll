@@ -1,5 +1,5 @@
-import {audienceNamespace, speakerNamespace, getSocketsByUuid, uuids, uuidInRoom} from "./index";
 import {makeRoom, sendState, sendPickedState, roomStates, getAudience, getSpeakers, sendAudience} from "./room";
+import {audienceNamespace, speakerNamespace, getSocketsByUuid, uuids, uuidInRoom} from "./index";
 
 
 export const connect = function () {

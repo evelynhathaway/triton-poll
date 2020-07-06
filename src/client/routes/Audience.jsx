@@ -9,14 +9,14 @@ import {AppContext} from "../contexts";
 export default class Audience extends React.Component {
 	static contextType = AppContext
 
-	componentDidMount() {
+	componentDidMount () {
 		this.context.connect("audience");
 	}
-	componentWillUnmount() {
+	componentWillUnmount () {
 		this.context.disconnect();
 	}
 
-	render() {
+	render () {
 		const {status, member} = this.context.state;
 		const {countryName, roomCode} = member;
 

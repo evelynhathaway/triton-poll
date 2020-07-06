@@ -3,17 +3,17 @@ import ReactDOM from "react-dom";
 import {BrowserRouter as Router, Switch, Route} from "react-router-dom";
 import io from "socket.io-client";
 
-import Header from "./components/Header";
 import AlertBanner from "./components/AlertBanner";
 import Footer from "./components/Footer";
+import Header from "./components/Header";
+import {AppContext} from "./contexts";
 import Audience from "./routes/Audience";
 import Speaker from "./routes/Speaker";
 import Whoops404 from "./routes/Whoops404";
-import {AppContext} from "./contexts";
 
 
 export default class App extends React.Component {
-	constructor() {
+	constructor () {
 		super(...arguments);
 
 		this.setState = this.setState.bind(this);
@@ -38,7 +38,7 @@ export default class App extends React.Component {
 		},
 	}
 
-	connect(namespace) {
+	connect (namespace) {
 		const socketAddress = (process.env.NODE_ENV === "development" ? ":8080" : "");
 		const socketPath = `${socketAddress}/${namespace}`;
 
@@ -51,36 +51,36 @@ export default class App extends React.Component {
 		this.socket.on("disconnect", this.disconnected);
 		this.socket.on("set state", this.setState);
 	}
-	disconnect() {
+	disconnect () {
 		this.socket.disconnect();
 		this.socket = undefined;
 	}
 
-	setUuid(uuid) {
+	setUuid (uuid) {
 		document.cookie = `uuid=${uuid}`;
 	}
 
-	connected() {
+	connected () {
 		this.setState({
 			status: "connected",
 		});
 	}
-	disconnected() {
+	disconnected () {
 		this.setState({
 			status: "disconnected",
 		});
 	}
 
-	join(member) {
+	join (member) {
 		// Ask server to join using the member object
 		this.socket.emit("join", member, error => alert(error));
 	}
-	leave() {
+	leave () {
 		// Ask server to leave using the member object
 		this.socket.emit("leave", this.state.member);
 	}
 
-	render() {
+	render () {
 		return (
 			<AppContext.Provider value={this}>
 				<div id="content">

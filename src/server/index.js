@@ -1,13 +1,13 @@
+import path from "path";
 import express from "express";
 import SocketIO from "socket.io";
-import uuidv4 from "uuid/v4";
-import path from "path";
+import {v4 as uuidv4} from "uuid";
 
 // Room helper functions
+import * as audience from "./audience";
 import {makeRoom} from "./room";
 
 // Server-sider sockets code for each context
-import * as audience from "./audience";
 import * as speaker from "./speaker";
 
 
@@ -42,7 +42,7 @@ export const uuids = new Map();
 export const uuidInRoom = {};
 
 export const getUuidFromCookie = function (cookie) {
-	return /(?:^|;\s*)uuid\s*=\s*([^;]*)/.exec(cookie)?.[1];
+	return /(?:^|;\s*)uuid\s*=\s*(?<cookie>[^;]*)/.exec(cookie)?.groups.cookie;
 };
 export const hasUuidEntry = function (uuid) {
 	return [...uuids.values()].includes(uuid);

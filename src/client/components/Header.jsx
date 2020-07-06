@@ -5,7 +5,7 @@ import {AppContext} from "../contexts";
 export default class Header extends React.Component {
 	static contextType = AppContext
 
-	render() {
+	render () {
 		const {committee, member} = this.context.state;
 		const {roomCode} = member;
 

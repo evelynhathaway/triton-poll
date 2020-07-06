@@ -5,33 +5,33 @@ import {AppContext} from "../../contexts";
 export default class Voting extends React.Component {
 	static contextType = AppContext
 
-	constructor() {
+	constructor () {
 		super(...arguments);
 
 		this.startVoting = this.startVoting.bind(this);
 		this.endVoting = this.endVoting.bind(this);
 	}
 
-	startVoting() {
+	startVoting () {
 		const {socket} = this.context;
 		const {member} = this.context.state;
 
 		socket.emit("start voting", member);
 	}
-	endVoting() {
+	endVoting () {
 		const {socket} = this.context;
 		const {member} = this.context.state;
 
 		socket.emit("end voting", member);
 	}
 
-	makePercent(amount, total, places = 2) {
+	makePercent (amount, total, places = 2) {
 		const multiplier = 10**places;
 		const percent = Math.round(amount / total * 100 * multiplier) / multiplier;
 		return total ? percent + "%" : "N/A";
 	}
 
-	makeResults() {
+	makeResults () {
 		const {audience} = this.context.state;
 
 		return audience.reduce(
@@ -53,7 +53,7 @@ export default class Voting extends React.Component {
 		);
 	}
 
-	render() {
+	render () {
 		const {voting} = this.context.state;
 		const {yes, no, abstain, total, votingTotal} = this.makeResults();
 
@@ -63,7 +63,7 @@ export default class Voting extends React.Component {
 				<p>The vote totals and percentage are shown here. Click <em>Start</em> to start asking for votes and <em>Clear and End</em> to stop taking votes and clear the table.</p>
 
 				<button
-					className={"btn btn-primary"}
+					className="btn btn-primary"
 					onClick={voting ? this.endVoting : this.startVoting}
 				>
 					{voting ? "Clear and End" : "Start"}

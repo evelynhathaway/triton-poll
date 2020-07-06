@@ -5,7 +5,7 @@ import {AppContext} from "../../contexts";
 export default class Attendance extends React.Component {
 	static contextType = AppContext
 
-	addMemberRow(member, index) {
+	addMemberRow (member, index) {
 		return (
 			<tr key={index}>
 				<td>{member.countryName}</td>
@@ -15,7 +15,7 @@ export default class Attendance extends React.Component {
 		);
 	}
 
-	render() {
+	render () {
 		const {audience} = this.context.state;
 		const disconnected = audience.filter(member => member.status === "disconnected").length;
 

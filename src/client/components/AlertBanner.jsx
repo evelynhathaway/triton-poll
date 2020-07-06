@@ -5,7 +5,7 @@ import {AppContext} from "../contexts";
 export default class AlertBanner extends React.Component {
 	static contextType = AppContext
 
-	render() {
+	render () {
 		const {status} = this.context.state;
 
 		return (

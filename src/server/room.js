@@ -1,5 +1,5 @@
-import {speakerNamespace} from "./index";
 import {pick} from "./util";
+import {speakerNamespace} from "./index";
 
 
 // Create object for the state for each room

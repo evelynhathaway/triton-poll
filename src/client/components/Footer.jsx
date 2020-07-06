@@ -5,7 +5,7 @@ import {AppContext} from "../contexts";
 export default class Footer extends React.Component {
 	static contextType = AppContext
 
-	render() {
+	render () {
 		const {roomCode} = this.context.state.member;
 		const leave = this.context.leave.bind(this.context);
 

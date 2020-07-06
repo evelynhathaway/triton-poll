@@ -5,14 +5,14 @@ import {AppContext} from "../../contexts";
 export default class Voting extends React.Component {
 	static contextType = AppContext
 
-	vote(position) {
+	vote (position) {
 		const {socket} = this.context;
 		const {member} = this.context.state;
 
 		socket.emit("vote", member, position);
 	}
 
-	render() {
+	render () {
 		const {voting, member} = this.context.state;
 		const {vote} = member;
 

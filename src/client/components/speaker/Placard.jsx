@@ -11,14 +11,14 @@ export default class Placard extends React.Component {
 		member: PropTypes.object.isRequired,
 	}
 
-	lowerPlacard() {
+	lowerPlacard () {
 		const {socket} = this.context;
 		const {member} = this.props;
 
 		socket.emit("lower placard", [member]);
 	}
 
-	render() {
+	render () {
 		const {countryName} = this.props.member;
 
 		return (

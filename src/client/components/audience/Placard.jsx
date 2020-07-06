@@ -3,7 +3,7 @@ import {AppContext} from "../../contexts";
 
 
 export default class Placard extends React.Component {
-	constructor() {
+	constructor () {
 		super(...arguments);
 
 		this.lowerPlacard = this.lowerPlacard.bind(this);
@@ -12,20 +12,20 @@ export default class Placard extends React.Component {
 
 	static contextType = AppContext
 
-	raisePlacard() {
+	raisePlacard () {
 		const {socket} = this.context;
 		const {member} = this.context.state;
 
 		socket.emit("raise placard", member);
 	}
-	lowerPlacard() {
+	lowerPlacard () {
 		const {socket} = this.context;
 		const {member} = this.context.state;
 
 		socket.emit("lower placard", member);
 	}
 
-	render() {
+	render () {
 		const {member} = this.context.state;
 		const {countryName, placard} = member;
 		const {raised} = placard;

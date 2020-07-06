@@ -8,7 +8,7 @@ export default class Join extends React.Component {
 	countryNameRef = React.createRef()
 	roomCodeRef = React.createRef()
 
-	submit() {
+	submit () {
 		const countryNameEle = this.countryNameRef.current;
 		const roomCodeEle = this.roomCodeRef.current;
 
@@ -18,7 +18,7 @@ export default class Join extends React.Component {
 		this.context.join({countryName, roomCode});
 	}
 
-	render() {
+	render () {
 		return (
 			<div>
 				<h2>Join a room</h2>

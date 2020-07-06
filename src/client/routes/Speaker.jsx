@@ -1,23 +1,23 @@
 import React from "react";
 
-import Join from "../components/speaker/Join";
-import Voting from "../components/speaker/Voting";
-import Placards from "../components/speaker/Placards";
 import Attendance from "../components/speaker/Attendance";
+import Join from "../components/speaker/Join";
+import Placards from "../components/speaker/Placards";
+import Voting from "../components/speaker/Voting";
 import {AppContext} from "../contexts";
 
 
 export default class Speaker extends React.Component {
 	static contextType = AppContext
 
-	componentDidMount() {
+	componentDidMount () {
 		this.context.connect("speaker");
 	}
-	componentWillUnmount() {
+	componentWillUnmount () {
 		this.context.disconnect();
 	}
 
-	render() {
+	render () {
 		const {status, member} = this.context.state;
 		const {roomCode} = member;
 

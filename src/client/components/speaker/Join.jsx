@@ -12,19 +12,19 @@ export default class JoinSpeaker extends React.Component {
 	committeeRef = React.createRef()
 	roomCodeRef = React.createRef()
 
-	componentDidMount() {
+	componentDidMount () {
 		this.listRooms();
 	}
 
 	// TODO: refresh list
-	listRooms() {
+	listRooms () {
 		const {socket} = this.context;
 
 		// List rooms and add to state
 		socket.emit("list rooms", this.setState.bind(this));
 	}
 
-	createRoom() {
+	createRoom () {
 		const {socket} = this.context;
 
 		const committeeEle = this.committeeRef.current;
@@ -37,7 +37,7 @@ export default class JoinSpeaker extends React.Component {
 		socket.emit("create room", {committee, roomCode, join: true}, error => alert(error));
 	}
 
-	render() {
+	render () {
 		const {rooms} = this.state;
 
 		return (
@@ -66,7 +66,7 @@ export default class JoinSpeaker extends React.Component {
 					</table>
 				</div>
 
-				<hr className="my-3"></hr>
+				<hr className="my-3" />
 
 				<h2>Create a room</h2>
 				<form action="javascript:void(0)" onSubmit={this.createRoom.bind(this)}>
